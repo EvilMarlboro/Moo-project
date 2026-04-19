@@ -80,8 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSupabaseUserId(null);
         setUser(null);
       }
-    } catch (err) {
-      console.error('Error refreshing session:', err);
+    } catch {
+      // session refresh failed silently
     } finally {
       setLoading(false);
     }
@@ -174,7 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .eq('id', supabaseUserId);
         
         if (error) {
-          console.error('Error updating profile:', error);
+          // profile update failed silently
         }
       }
     }

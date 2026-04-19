@@ -107,8 +107,7 @@ export function Settings() {
       setTimeout(() => {
         navigate('/login', { replace: true });
       }, 100);
-    } catch (error) {
-      console.error('Logout error:', error);
+    } catch {
       navigate('/login', { replace: true });
     }
   };

@@ -1,18 +1,3 @@
-export const AVATARS = [
-  { id: 'avatar1', name: 'Adventurer', url: '🧗' },
-  { id: 'avatar2', name: 'Athlete', url: '⛹️' },
-  { id: 'avatar3', name: 'Scholar', url: '👨‍🎓' },
-  { id: 'avatar4', name: 'Artist', url: '👨‍🎨' },
-  { id: 'avatar5', name: 'Gamer', url: '🎮' },
-  { id: 'avatar6', name: 'Explorer', url: '🧭' },
-  { id: 'avatar7', name: 'Musician', url: '🎸' },
-  { id: 'avatar8', name: 'Chef', url: '👨‍🍳' },
-  { id: 'avatar9', name: 'Scientist', url: '👨‍🔬' },
-  { id: 'avatar10', name: 'Dancer', url: '💃' },
-  { id: 'avatar11', name: 'Coder', url: '👨‍💻' },
-  { id: 'avatar12', name: 'Photographer', url: '📸' },
-];
-
 export const CATEGORY_COLORS = {
   sports: '#10B981', // Green
   gaming: '#A855F7', // Purple
@@ -98,5 +83,3 @@ export const ACTIVITIES = {
     'Watch Parties'
   ]
 };
-
-export const FILTER_TAGS = ['Chill', 'Social', 'Short Hangout', 'Late Night'];

@@ -118,7 +118,6 @@ export function LoginPage() {
         setSignupSuccess(true);
       }
     } catch (err: any) {
-      console.error('Signup error:', err);
       setError(err.message || 'An unexpected error occurred');
     } finally {
       setLoading(false);

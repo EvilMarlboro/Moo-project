@@ -96,7 +96,6 @@ export function Chat() {
         .single();
 
       if (chatError || !chatData) {
-        console.log('Error loading chat:', chatError);
         setLoading(false);
         return;
       }
@@ -129,8 +128,8 @@ export function Chat() {
           partnerActivities = profile.enabled_activities;
           partnerActivityProfiles = profile.activity_profiles;
         }
-      } catch (err) {
-        console.error('Error fetching partner profile:', err);
+      } catch {
+        // partner profile fetch failed, use defaults
       }
 
       setPartner({
@@ -212,8 +211,7 @@ export function Chat() {
     });
 
     if (error) {
-      console.log('Error sending message:', error);
-      setInputText(content); // Restore on error
+      setInputText(content);
     }
   };
 
@@ -249,8 +247,7 @@ export function Chat() {
 
       toast.success('Unmatched successfully');
       navigate('/activity-hub');
-    } catch (error) {
-      console.error('Error unmatching:', error);
+    } catch {
       toast.error('Failed to unmatch. Please try again.');
     }
   };

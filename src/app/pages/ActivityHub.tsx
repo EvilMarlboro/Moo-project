@@ -16,7 +16,6 @@ import { Card } from '../components/ui/card';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { UserAvatar } from '../components/UserAvatar';
 import { supabase } from '../lib/supabase';
-import { publicAnonKey } from '/utils/supabase/info';
 import { toast } from 'sonner';
 
 interface OnlineUser {
@@ -96,10 +95,7 @@ export function ActivityHub() {
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.log('Error fetching match requests:', error);
-      return;
-    }
+    if (error) return;
 
     if (!data || data.length === 0) {
       setMatchRequests([]);
@@ -197,7 +193,7 @@ export function ActivityHub() {
       .or(`user1_id.eq.${authUser.id},user2_id.eq.${authUser.id}`)
       .order('created_at', { ascending: false });
 
-    if (error) { console.log('Error fetching chats:', error); return; }
+    if (error) return;
     if (!data || data.length === 0) { setChats([]); return; }
 
     const enriched = await Promise.all(
@@ -215,8 +211,8 @@ export function ActivityHub() {
             partnerName = profile.display_name || 'USC Student';
             partnerAvatar = profile.avatar || '👤';
           }
-        } catch (err) {
-          console.log('Error fetching partner profile:', err);
+        } catch {
+          // partner profile fetch failed, use defaults
         }
         return {
           id: chat.id,
@@ -243,7 +239,7 @@ export function ActivityHub() {
       .select('receiver_id')
       .eq('sender_id', authUser.id)
       .eq('status', 'pending');
-    if (error) { console.log('Error fetching sent requests:', error); return; }
+    if (error) return;
     setSentRequests(data && data.length > 0
       ? new Set(data.map((req: any) => req.receiver_id))
       : new Set());
