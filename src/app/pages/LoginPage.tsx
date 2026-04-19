@@ -97,7 +97,10 @@ export function LoginPage() {
         return;
       }
 
+      console.log('LOG 1: auth succeeded, user id:', data.user.id);
+
       try {
+        console.log('LOG 2: starting profiles query');
         const profileQuery = supabase
           .from('profiles')
           .select('id, display_name, avatar')
@@ -105,16 +108,22 @@ export function LoginPage() {
           .single();
         const profileTimeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 3000));
         const result = await Promise.race([profileQuery, profileTimeout]);
+        console.log('LOG 3: profiles query resolved, result:', result);
         const profile = result && 'data' in result ? result.data : null;
+        console.log('LOG 4: profile extracted:', profile);
         didNavigate = true;
+        console.log('LOG 5: navigating to', profile?.display_name && profile?.avatar ? '/activity-hub' : '/profile-setup');
         navigate(profile?.display_name && profile?.avatar ? '/activity-hub' : '/profile-setup');
-      } catch {
+      } catch (err) {
+        console.log('LOG 6: inner catch fired, error:', err);
         didNavigate = true;
         navigate('/activity-hub');
       }
-    } catch {
+    } catch (err) {
+      console.log('LOG 7: outer catch fired, error:', err);
       setError('Sign in failed. Please try again.');
     } finally {
+      console.log('LOG 8: finally block, didNavigate:', didNavigate);
       clearTimeout(timeout);
       setLoading(false);
     }
