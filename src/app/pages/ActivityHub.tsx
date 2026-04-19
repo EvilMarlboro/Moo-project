@@ -482,22 +482,22 @@ export function ActivityHub() {
           {selectedUser && (
             <>
               <DialogHeader>
-                <div className="flex items-center gap-4 mb-2">
+                <div className="flex flex-col items-center text-center gap-3 mb-2">
                   <div className="relative">
                     <UserAvatar
                       avatar={selectedUser.avatar || '👤'}
                       username={selectedUser.username}
-                      className="w-20 h-20 border-2 border-purple-300"
-                      fallbackClassName="text-4xl bg-purple-50"
+                      className="w-36 h-36 border-[3px] border-purple-300"
+                      fallbackClassName="text-7xl bg-purple-50"
                     />
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white" />
+                    <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <DialogTitle className="text-xl">{selectedUser.username}</DialogTitle>
+                    <div className="flex items-center justify-center gap-2">
+                      <DialogTitle className="text-2xl">{selectedUser.username}</DialogTitle>
                       {selectedUser.genderSymbol && (
                         <span
-                          className="text-xl"
+                          className="text-2xl"
                           style={{
                             color: selectedUser.genderSymbol === '♂' ? '#3B82F6'
                               : selectedUser.genderSymbol === '♀' ? '#EC4899'
@@ -510,25 +510,23 @@ export function ActivityHub() {
                       <Shield className="h-4 w-4 text-[#990000]" />
                     </div>
                     <p className="text-sm text-muted-foreground">USC Student</p>
+                    {selectedUser.statusMessage && (
+                      <DialogDescription className="italic mt-1">
+                        "{selectedUser.statusMessage}"
+                      </DialogDescription>
+                    )}
                   </div>
                 </div>
-                {selectedUser.statusMessage && (
-                  <DialogDescription className="italic text-left">
-                    "{selectedUser.statusMessage}"
-                  </DialogDescription>
-                )}
               </DialogHeader>
 
               {/* Weekly match count */}
-              <div className="flex items-center gap-2 px-1 py-2 mb-1">
-                <div className="flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-lg px-3 py-2 flex-1">
+              <div className="flex justify-center py-1 mb-1">
+                <div className="flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-full px-4 py-2">
                   <Heart className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs text-muted-foreground leading-none mb-0.5">Matches this week</p>
-                    <p className="text-lg font-semibold text-purple-700 leading-none">
-                      {selectedUserMatchCount === null ? '—' : selectedUserMatchCount}
-                    </p>
-                  </div>
+                  <span className="text-sm text-muted-foreground">Matches this week:</span>
+                  <span className="text-sm font-semibold text-purple-700">
+                    {selectedUserMatchCount === null ? '—' : selectedUserMatchCount}
+                  </span>
                 </div>
               </div>
 
@@ -781,7 +779,7 @@ export function ActivityHub() {
 
             {/* Users Grid */}
             {allOtherUsers.length > 0 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {allOtherUsers.map(presenceUser => {
                   const primaryCategory = presenceUser.categories?.[0];
                   const cardColor = CATEGORY_COLORS[primaryCategory as keyof typeof CATEGORY_COLORS] || '#9333EA';
@@ -792,79 +790,75 @@ export function ActivityHub() {
                   return (
                     <Card
                       key={presenceUser.user_id}
-                      className="p-4 bg-gradient-to-br from-white to-purple-50 border-2 hover:scale-[1.02] transition-all hover:shadow-xl cursor-pointer"
+                      className="p-5 bg-gradient-to-br from-white to-purple-50 border-2 hover:scale-[1.02] transition-all hover:shadow-xl cursor-pointer flex flex-col items-center text-center"
                       style={{ borderColor: cardColor, boxShadow: `0 4px 20px ${cardColor}20` }}
                       onClick={() => openUserModal(presenceUser)}
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="relative flex-shrink-0">
-                          <UserAvatar
-                            avatar={presenceUser.avatar || '👤'}
-                            username={presenceUser.username}
-                            className="w-14 h-14 border-2"
-                            fallbackClassName="text-2xl"
-                            fallbackStyle={{ backgroundColor: cardColor + '20', borderColor: cardColor }}
-                          />
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card" />
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <h3 className="text-sm font-semibold truncate">{presenceUser.username}</h3>
-                            {presenceUser.genderSymbol && (
-                              <span
-                                className="text-sm flex-shrink-0"
-                                style={{
-                                  color: presenceUser.genderSymbol === '♂' ? '#3B82F6'
-                                    : presenceUser.genderSymbol === '♀' ? '#EC4899'
-                                    : cardColor,
-                                }}
-                              >
-                                {presenceUser.genderSymbol}
-                              </span>
-                            )}
-                            <Shield className="h-3 w-3 text-[#990000] flex-shrink-0" />
-                          </div>
-
-                          {/* Category summary */}
-                          <div className="flex flex-wrap gap-1 mb-2">
-                            {presenceUser.vibingMode ? (
-                              <span className="text-xs font-medium text-purple-600">🎵 Vibing</span>
-                            ) : categoryLabels.length > 0 ? (
-                              <span className="text-xs text-muted-foreground">
-                                {categoryLabels.join(' • ')}
-                              </span>
-                            ) : null}
-                          </div>
-
-                          {/* Status message */}
-                          {presenceUser.statusMessage && (
-                            <p className="text-xs text-muted-foreground italic line-clamp-1 mb-2">
-                              "{presenceUser.statusMessage}"
-                            </p>
-                          )}
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="w-full h-7 text-xs"
-                            style={
-                              acceptedConnections.has(presenceUser.user_id)
-                                ? {}
-                                : { borderColor: cardColor, color: cardColor }
-                            }
-                            disabled={sentRequests.has(presenceUser.user_id) || acceptedConnections.has(presenceUser.user_id)}
-                            onClick={(e) => { e.stopPropagation(); handleConnect(presenceUser); }}
-                          >
-                            <MessageCircle className="h-3 w-3 mr-1" />
-                            {acceptedConnections.has(presenceUser.user_id)
-                              ? 'Already Connected'
-                              : sentRequests.has(presenceUser.user_id)
-                              ? 'Request Sent ✓'
-                              : 'Connect'}
-                          </Button>
-                        </div>
+                      {/* Avatar — large, centred */}
+                      <div className="relative mb-4">
+                        <UserAvatar
+                          avatar={presenceUser.avatar || '👤'}
+                          username={presenceUser.username}
+                          className="w-28 h-28 border-[3px]"
+                          fallbackClassName="text-5xl"
+                          fallbackStyle={{ backgroundColor: cardColor + '20', borderColor: cardColor }}
+                        />
+                        <div className="absolute bottom-0.5 right-0.5 w-5 h-5 bg-green-500 rounded-full border-2 border-card" />
                       </div>
+
+                      {/* Name + gender + badge */}
+                      <div className="flex items-center justify-center gap-1.5 mb-1">
+                        <h3 className="font-semibold truncate max-w-[120px]">{presenceUser.username}</h3>
+                        {presenceUser.genderSymbol && (
+                          <span
+                            className="flex-shrink-0"
+                            style={{
+                              color: presenceUser.genderSymbol === '♂' ? '#3B82F6'
+                                : presenceUser.genderSymbol === '♀' ? '#EC4899'
+                                : cardColor,
+                            }}
+                          >
+                            {presenceUser.genderSymbol}
+                          </span>
+                        )}
+                        <Shield className="h-3.5 w-3.5 text-[#990000] flex-shrink-0" />
+                      </div>
+
+                      {/* Category / vibing */}
+                      <div className="mb-2 min-h-[1.25rem]">
+                        {presenceUser.vibingMode ? (
+                          <span className="text-xs font-medium text-purple-600">🎵 Vibing</span>
+                        ) : categoryLabels.length > 0 ? (
+                          <span className="text-xs text-muted-foreground">{categoryLabels.join(' • ')}</span>
+                        ) : null}
+                      </div>
+
+                      {/* Status message */}
+                      {presenceUser.statusMessage && (
+                        <p className="text-xs text-muted-foreground italic line-clamp-2 mb-3 px-1">
+                          "{presenceUser.statusMessage}"
+                        </p>
+                      )}
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full mt-auto"
+                        style={
+                          acceptedConnections.has(presenceUser.user_id)
+                            ? {}
+                            : { borderColor: cardColor, color: cardColor }
+                        }
+                        disabled={sentRequests.has(presenceUser.user_id) || acceptedConnections.has(presenceUser.user_id)}
+                        onClick={(e) => { e.stopPropagation(); handleConnect(presenceUser); }}
+                      >
+                        <MessageCircle className="h-3.5 w-3.5 mr-1.5" />
+                        {acceptedConnections.has(presenceUser.user_id)
+                          ? 'Already Connected'
+                          : sentRequests.has(presenceUser.user_id)
+                          ? 'Request Sent ✓'
+                          : 'Connect'}
+                      </Button>
                     </Card>
                   );
                 })}
