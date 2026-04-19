@@ -36,36 +36,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isRefreshingRef = useRef(false);
 
   const refreshSession = async () => {
-    console.log('refreshSession: start');
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setSupabaseUserId(session.user.id);
-        
-        // Load complete profile from Supabase profiles table
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profile && profile.display_name) {
-          // User has a complete profile
-          setUser({
-            id: session.user.id,
-            username: profile.display_name,
-            email: session.user.email || '',
-            avatar: profile.avatar || '👤',
-            genderSymbol: profile.gender,
-            enabledActivities: profile.enabled_activities || [],
-            activityProfiles: profile.activity_profiles || {},
-            statusMessage: profile.status_message || '',
-            vibingMode: profile.vibing_mode || false,
-          });
-        } else {
-          // No complete profile - user needs to set up profile
-          setUser(null);
-        }
+        setUser({
+          id: session.user.id,
+          username: '',
+          email: session.user.email || '',
+          avatar: '👤',
+          enabledActivities: [],
+          activityProfiles: {},
+        });
       } else {
         setSupabaseUserId(null);
         setUser(null);
@@ -73,7 +55,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error('Error refreshing session:', err);
     } finally {
-      console.log('refreshSession: complete', user);
       setLoading(false);
     }
   };
