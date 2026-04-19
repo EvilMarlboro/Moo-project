@@ -575,6 +575,15 @@ export function ActivityHub() {
     setIsLoginPromptOpen(true);
   };
 
+  // Session still restoring — show spinner
+  if (user === undefined) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
   // Handle authenticated user with no activities
   if (user && enabledCategories.length === 0 && !user.vibingMode) {
     return (
