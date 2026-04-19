@@ -363,7 +363,8 @@ export function LoginPage() {
             )}
 
             <Button
-              type="submit"
+              type={mode === 'login' ? 'button' : 'submit'}
+              onClick={mode === 'login' ? handleLogin : undefined}
               disabled={loading || signupDisabled}
               className="w-full bg-[#990000] hover:bg-[#7a0000] text-white"
               size="lg"
