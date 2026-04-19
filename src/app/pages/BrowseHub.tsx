@@ -42,6 +42,7 @@ export function BrowseHub() {
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [loadingPresence, setLoadingPresence] = useState(true);
   const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
+  const [acceptedConnections, setAcceptedConnections] = useState<Set<string>>(new Set());
 
   const allCategories: Category[] = ['sports', 'gaming', 'studying', 'campusEvents'];
 
@@ -62,6 +63,44 @@ export function BrowseHub() {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  // Load accepted connections and keep in sync
+  useEffect(() => {
+    if (!supabaseUserId) return;
+
+    const fetchAcceptedConnections = async () => {
+      const { data } = await supabase
+        .from('match_requests')
+        .select('sender_id, receiver_id')
+        .eq('status', 'accepted')
+        .or(`sender_id.eq.${supabaseUserId},receiver_id.eq.${supabaseUserId}`);
+      if (data) {
+        setAcceptedConnections(new Set(
+          data.map(r => r.sender_id === supabaseUserId ? r.receiver_id : r.sender_id)
+        ));
+      }
+    };
+
+    fetchAcceptedConnections();
+
+    const channel = supabase
+      .channel('accepted-connections-browse-' + supabaseUserId)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'match_requests',
+        filter: `sender_id=eq.${supabaseUserId}`,
+      }, fetchAcceptedConnections)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'match_requests',
+        filter: `receiver_id=eq.${supabaseUserId}`,
+      }, fetchAcceptedConnections)
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [supabaseUserId]);
 
   // Filter out self and filter by category
   const otherUsers = onlineUsers.filter((u) => u.user_id !== supabaseUserId);
@@ -329,14 +368,19 @@ export function BrowseHub() {
                                         size="sm"
                                         variant="outline"
                                         className="w-full"
-                                        style={{
-                                          borderColor: categoryColor,
-                                          color: categoryColor,
-                                        }}
-                                        disabled={sentRequests.has(presenceUser.user_id)}
+                                        style={
+                                          acceptedConnections.has(presenceUser.user_id)
+                                            ? {}
+                                            : { borderColor: categoryColor, color: categoryColor }
+                                        }
+                                        disabled={sentRequests.has(presenceUser.user_id) || acceptedConnections.has(presenceUser.user_id)}
                                       >
                                         <MessageCircle className="h-4 w-4 mr-1" />
-                                        {sentRequests.has(presenceUser.user_id) ? 'Request Sent ✓' : 'Connect'}
+                                        {acceptedConnections.has(presenceUser.user_id)
+                                          ? 'Already Connected'
+                                          : sentRequests.has(presenceUser.user_id)
+                                          ? 'Request Sent ✓'
+                                          : 'Connect'}
                                       </Button>
                                     ) : (
                                       <Button

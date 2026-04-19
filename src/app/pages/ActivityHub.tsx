@@ -59,9 +59,24 @@ export function ActivityHub() {
   const [matchRequests, setMatchRequests] = useState<any[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
+  const [acceptedConnections, setAcceptedConnections] = useState<Set<string>>(new Set());
   const [chats, setChats] = useState<ChatItem[]>([]);
 
   const serverBase = `https://${projectId}.supabase.co/functions/v1/make-server-5eb2b086`;
+
+  const fetchAcceptedConnections = async () => {
+    if (!supabaseUserId) return;
+    const { data } = await supabase
+      .from('match_requests')
+      .select('sender_id, receiver_id')
+      .eq('status', 'accepted')
+      .or(`sender_id.eq.${supabaseUserId},receiver_id.eq.${supabaseUserId}`);
+    if (data) {
+      setAcceptedConnections(new Set(
+        data.map(r => r.sender_id === supabaseUserId ? r.receiver_id : r.sender_id)
+      ));
+    }
+  };
 
   // Fetch match requests from Supabase
   const fetchMatchRequests = async () => {
@@ -136,8 +151,9 @@ export function ActivityHub() {
   useEffect(() => {
     if (!supabaseUserId) return;
 
-    // Initial load only
+    // Initial load
     fetchMatchRequests();
+    fetchAcceptedConnections();
 
     // Single realtime channel for all match request events
     const channel = supabase
@@ -192,6 +208,7 @@ export function ActivityHub() {
         async (payload: any) => {
           console.log('Sent request updated:', payload);
           if (payload.new.status === 'accepted') {
+            fetchAcceptedConnections();
             const { data: chat } = await supabase
               .from('chats')
               .select('id')
@@ -1061,11 +1078,19 @@ export function ActivityHub() {
                                     size="sm"
                                     variant="outline"
                                     className="w-full"
-                                    style={{ borderColor: categoryColor, color: categoryColor }}
-                                    disabled={sentRequests.has(presenceUser.user_id)}
+                                    style={
+                                      acceptedConnections.has(presenceUser.user_id)
+                                        ? {}
+                                        : { borderColor: categoryColor, color: categoryColor }
+                                    }
+                                    disabled={sentRequests.has(presenceUser.user_id) || acceptedConnections.has(presenceUser.user_id)}
                                   >
                                     <MessageCircle className="h-4 w-4 mr-1" />
-                                    {sentRequests.has(presenceUser.user_id) ? 'Request Sent ✓' : 'Connect'}
+                                    {acceptedConnections.has(presenceUser.user_id)
+                                      ? 'Already Connected'
+                                      : sentRequests.has(presenceUser.user_id)
+                                      ? 'Request Sent ✓'
+                                      : 'Connect'}
                                   </Button>
                                 </div>
                               </div>
