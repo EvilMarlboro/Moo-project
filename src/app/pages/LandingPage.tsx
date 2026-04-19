@@ -10,11 +10,15 @@ export function LandingPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasScrolledPast, setHasScrolledPast] = useState(false);
 
-  // Auto-redirect logged-in users to activity hub
+  // Auto-scroll logged-in users down after a brief delay so the landing page
+  // is always seen before navigation, then the scroll listener handles routing.
   useEffect(() => {
-    if (loading) return;
-    if (user) navigate('/activity-hub', { replace: true });
-  }, [user, loading, navigate]);
+    if (loading || !user) return;
+    const timer = setTimeout(() => {
+      window.scrollTo({ top: 400, behavior: 'smooth' });
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [user, loading]);
 
   // Track window scroll instead of container scroll
   const { scrollY } = useScroll();
@@ -38,15 +42,20 @@ export function LandingPage() {
       const scrollPercent = (latest / 500) * 100;
       if (scrollPercent > 50 && !hasScrolledPast) {
         setHasScrolledPast(true);
-        // Navigate to Browse Hub after scrolling threshold with slight delay
         setTimeout(() => {
-          navigate('/browse-hub');
+          if (user && user.username === '') {
+            navigate('/profile-setup');
+          } else if (user) {
+            navigate('/activity-hub');
+          } else {
+            navigate('/browse-hub');
+          }
         }, 200);
       }
     });
 
     return () => unsubscribe();
-  }, [scrollY, navigate, hasScrolledPast]);
+  }, [scrollY, navigate, hasScrolledPast, user]);
 
   return (
     <div 
