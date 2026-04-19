@@ -82,7 +82,7 @@ export function Navbar() {
                   Sign In
                 </Button>
               </>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
