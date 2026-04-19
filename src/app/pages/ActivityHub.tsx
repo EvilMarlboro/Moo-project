@@ -464,8 +464,8 @@ export function ActivityHub() {
               <DialogHeader>
                 <div className="flex items-center gap-4 mb-2">
                   <div className="relative">
-                    <Avatar className="w-20 h-20 border-2 border-amber-500/40">
-                      <AvatarFallback className="text-4xl bg-amber-500/10">
+                    <Avatar className="w-20 h-20 border-2 border-purple-300">
+                      <AvatarFallback className="text-4xl bg-purple-50">
                         {selectedUser.avatar || '👤'}
                       </AvatarFallback>
                     </Avatar>
@@ -500,14 +500,14 @@ export function ActivityHub() {
 
               <div className="py-2">
                 {selectedUser.vibingMode ? (
-                  <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-4">
-                    <p className="text-sm font-medium text-amber-400">🎵 Vibing — open to anything!</p>
+                  <div className="p-3 rounded-lg bg-purple-50 border border-purple-200 mb-4">
+                    <p className="text-sm font-medium text-purple-700">🎵 Vibing — open to anything!</p>
                   </div>
                 ) : (
                   <>
                     {profileLoading ? (
                       <div className="flex items-center justify-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-amber-400 border-t-transparent" />
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-purple-300 border-t-transparent" />
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -590,7 +590,7 @@ export function ActivityHub() {
             {/* Match Requests */}
             <Card className="p-4 border-2 border-border">
               <div className="flex items-center gap-2 mb-4">
-                <Heart className="h-5 w-5 text-amber-400" />
+                <Heart className="h-5 w-5 text-pink-500" />
                 <h3 className="text-lg">Match Requests</h3>
                 {matchRequests.length > 0 && (
                   <Badge variant="destructive" className="ml-auto">{matchRequests.length}</Badge>
@@ -662,7 +662,7 @@ export function ActivityHub() {
             {/* Chats */}
             <Card className="p-4 border-2 border-border">
               <div className="flex items-center gap-2 mb-4">
-                <MessageCircle className="h-5 w-5 text-amber-400" />
+                <MessageCircle className="h-5 w-5 text-blue-500" />
                 <h3 className="text-lg">Chats</h3>
               </div>
               <div className="space-y-2">
@@ -754,7 +754,7 @@ export function ActivityHub() {
                   return (
                     <Card
                       key={presenceUser.user_id}
-                      className="p-4 border hover:scale-[1.02] transition-all hover:shadow-2xl hover:shadow-black/50 cursor-pointer"
+                      className="p-4 bg-gradient-to-br from-white to-purple-50 border-2 hover:scale-[1.02] transition-all hover:shadow-xl cursor-pointer"
                       style={{ borderColor: cardColor, boxShadow: `0 4px 20px ${cardColor}20` }}
                       onClick={() => openUserModal(presenceUser)}
                     >
@@ -789,7 +789,7 @@ export function ActivityHub() {
                           {/* Category summary */}
                           <div className="flex flex-wrap gap-1 mb-2">
                             {presenceUser.vibingMode ? (
-                              <span className="text-xs font-medium text-amber-400">🎵 Vibing</span>
+                              <span className="text-xs font-medium text-purple-600">🎵 Vibing</span>
                             ) : categoryLabels.length > 0 ? (
                               <span className="text-xs text-muted-foreground">
                                 {categoryLabels.join(' • ')}

@@ -256,7 +256,7 @@ export function Chat() {
 
   if (loading) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-background">
         <Navbar />
         <div className="container mx-auto px-4 py-12 text-center">
           <p className="text-muted-foreground">Loading chat...</p>
@@ -267,7 +267,7 @@ export function Chat() {
 
   if (!chat || !partner || !user) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-background">
         <Navbar />
         <div className="container mx-auto px-4 py-12 text-center">
           <h2 className="mb-4">Chat not found</h2>
@@ -298,7 +298,7 @@ export function Chat() {
   const hasSharedGaming = sharedGamingActivities.length > 0;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -364,7 +364,7 @@ export function Chat() {
         </Card>
 
         {/* Safety Notice */}
-        <Card className="p-4 mb-4 border-amber-500/20 bg-amber-500/5">
+        <Card className="p-4 mb-4 bg-secondary/30 border-border">
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
             <div className="text-sm">
@@ -377,7 +377,7 @@ export function Chat() {
         </Card>
 
         {/* Messages */}
-        <Card className="p-4 mb-4 min-h-[400px] max-h-[500px] overflow-y-auto">
+        <Card className="p-4 mb-4 min-h-[400px] max-h-[500px] overflow-y-auto bg-card">
           {messages.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <p>No messages yet. Start the conversation!</p>
@@ -407,10 +407,8 @@ export function Chat() {
                         </span>
                       </div>
                       <div
-                        className={`inline-block p-3 rounded-2xl text-sm ${
-                          isOwnMessage
-                            ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-black font-medium shadow-lg shadow-amber-500/20'
-                            : 'bg-white/10 border border-white/10 backdrop-blur-sm text-foreground'
+                        className={`inline-block p-3 rounded-lg ${
+                          isOwnMessage ? 'bg-primary text-primary-foreground' : 'bg-secondary'
                         }`}
                       >
                         {message.content}

@@ -153,7 +153,7 @@ export function LoginPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <Card className="max-w-lg w-full p-8 border-white/15">
+          <Card className="max-w-lg w-full p-8 bg-card border-border">
             <div className="text-center mb-6">
               <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
               <h1 className="mb-2">Account Created!</h1>
@@ -186,7 +186,7 @@ export function LoginPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="p-8 border-white/15">
+        <Card className="p-8 bg-card border-border">
           <div className="text-center mb-8">
             <Shield className="h-12 w-12 mx-auto mb-3 text-[#990000]" />
             <h1 className="mb-2">
@@ -213,7 +213,7 @@ export function LoginPage() {
                         type="button"
                         onClick={handleResendConfirmation}
                         disabled={resendLoading}
-                        className="text-xs text-amber-400 hover:text-amber-300 underline transition-colors disabled:opacity-50"
+                        className="text-xs text-[#990000] hover:text-[#7a0000] underline transition-colors disabled:opacity-50"
                       >
                         {resendLoading ? 'Sending...' : 'Resend confirmation email'}
                       </button>
@@ -317,7 +317,7 @@ export function LoginPage() {
               type={mode === 'login' ? 'button' : 'submit'}
               onClick={mode === 'login' ? handleLogin : undefined}
               disabled={loading || signupDisabled}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-semibold shadow-lg shadow-amber-500/20"
+              className="w-full bg-[#990000] hover:bg-[#7a0000] text-white"
               size="lg"
             >
               {loading
