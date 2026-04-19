@@ -403,7 +403,7 @@ export function ActivityHub() {
   // Use all categories if not authenticated, in vibing mode, or use enabled categories
   const displayCategories = (!user || user.vibingMode) ? allCategories : enabledCategories;
 
-  const [activeCategory, setActiveCategory] = useState<Category>(
+  const [activeCategory, setActiveCategory] = useState<Category | 'vibing'>(
     displayCategories[0] || 'sports'
   );
   const [activeActivity, setActiveActivity] = useState<string | 'all'>('all');
@@ -412,7 +412,7 @@ export function ActivityHub() {
   useEffect(() => {
     if (enabledCategories.length > 0) {
       setActiveCategory(prev =>
-        enabledCategories.includes(prev) ? prev : enabledCategories[0]
+        prev === 'vibing' ? prev : enabledCategories.includes(prev as Category) ? prev : enabledCategories[0]
       );
     }
   }, [enabledCategories]);
@@ -479,7 +479,7 @@ export function ActivityHub() {
   };
 
   // Get all activities in the current category (flattened)
-  const currentCategoryActivities = getActivitiesInCategory(activeCategory);
+  const currentCategoryActivities = activeCategory === 'vibing' ? [] : getActivitiesInCategory(activeCategory as Category);
   const enabledActivitiesInCategory = (user && !user.vibingMode)
     ? currentCategoryActivities.filter(isActivityEnabled)
     : currentCategoryActivities;
@@ -487,11 +487,12 @@ export function ActivityHub() {
   // Filter real online users (exclude self, filter by category and activity)
   const filteredUsers = useMemo(() => {
     const others = onlineUsers.filter((u) => u.user_id !== supabaseUserId);
+    // Vibing tab shows everyone
+    if (activeCategory === 'vibing') return others;
     return others.filter((u) => {
       // Vibing users show in all categories
       const inCategory = u.vibingMode || (u.categories || []).includes(activeCategory);
       if (!inCategory) return false;
-
       if (activeActivity === 'all') return true;
       return (u.activities || []).includes(activeActivity);
     });
@@ -825,16 +826,16 @@ export function ActivityHub() {
           {/* Main Content */}
           <div className="flex-1 min-w-0">
             <Tabs value={activeCategory} onValueChange={(v) => {
-              setActiveCategory(v as Category);
+              setActiveCategory(v as Category | 'vibing');
               setActiveActivity('all');
             }}>
               <TabsList className="w-full justify-start mb-6 bg-gradient-to-r from-purple-100 to-pink-100 p-2 h-auto rounded-2xl border-2 border-purple-200">
                 {displayCategories.map((categoryKey) => {
                   const color = CATEGORY_COLORS[categoryKey];
-                  const categoryName = categoryKey === 'campusEvents' ? 'Campus Events' : 
+                  const categoryName = categoryKey === 'campusEvents' ? 'Campus Events' :
                                        categoryKey === 'social' ? 'Social & Hangouts' :
                                        categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
-                  
+
                   return (
                     <TabsTrigger
                       key={categoryKey}
@@ -849,6 +850,15 @@ export function ActivityHub() {
                     </TabsTrigger>
                   );
                 })}
+                <TabsTrigger
+                  value="vibing"
+                  className="data-[state=active]:shadow-md transition-all text-base px-6 py-3 rounded-xl font-semibold data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white"
+                  style={{
+                    color: activeCategory === 'vibing' ? undefined : '#9333EA',
+                  }}
+                >
+                  Vibing? 🎯
+                </TabsTrigger>
               </TabsList>
 
               {displayCategories.map(categoryKey => {
@@ -1110,6 +1120,125 @@ export function ActivityHub() {
                   </TabsContent>
                 );
               })}
+
+              {/* Vibing Tab Content */}
+              <TabsContent value="vibing" className="mt-0">
+                <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200">
+                  <p className="text-sm text-purple-700 font-medium">
+                    🎯 Everyone who's online right now — browse freely without activity filters
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 mb-4">
+                  <Users className="h-5 w-5 text-purple-500" />
+                  <span className="font-medium">
+                    {filteredUsers.length} {filteredUsers.length === 1 ? 'person' : 'people'} online now
+                  </span>
+                </div>
+
+                {filteredUsers.length > 0 ? (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredUsers.map(presenceUser => (
+                      <Card
+                        key={presenceUser.user_id}
+                        className="p-4 bg-gradient-to-br from-white to-purple-50 border-2 hover:scale-[1.02] transition-all hover:shadow-xl"
+                        style={{ borderColor: '#9333EA', boxShadow: '0 4px 20px #9333EA20' }}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="relative">
+                            <Avatar className="w-16 h-16 border-2" style={{ borderColor: '#9333EA' }}>
+                              <AvatarFallback className="text-3xl" style={{ backgroundColor: '#9333EA20' }}>
+                                {presenceUser.avatar || '👤'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-card" />
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="truncate">{presenceUser.username}</h3>
+                              {presenceUser.genderSymbol && (
+                                <span className="text-lg flex-shrink-0">{presenceUser.genderSymbol}</span>
+                              )}
+                            </div>
+
+                            {presenceUser.vibingMode ? (
+                              <p className="text-sm font-medium text-purple-500 mb-2">🎵 Vibing</p>
+                            ) : (
+                              <div className="flex flex-wrap gap-1 mb-2">
+                                {(presenceUser.activities || []).slice(0, 3).map(a => (
+                                  <span key={a} className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-medium">{a}</span>
+                                ))}
+                              </div>
+                            )}
+
+                            {presenceUser.statusMessage && (
+                              <p className="text-sm text-muted-foreground mb-3 italic line-clamp-2">
+                                "{presenceUser.statusMessage}"
+                              </p>
+                            )}
+
+                            <Button
+                              onClick={async () => {
+                                if (!user) { handleUnauthenticatedAction(); return; }
+                                const { data: { user: authUser } } = await supabase.auth.getUser();
+                                if (!authUser) return;
+                                const { data: existing } = await supabase
+                                  .from('match_requests')
+                                  .select('id, status')
+                                  .eq('sender_id', authUser.id)
+                                  .eq('receiver_id', presenceUser.user_id)
+                                  .maybeSingle();
+                                if (existing) {
+                                  setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
+                                  return;
+                                }
+                                const { error } = await supabase
+                                  .from('match_requests')
+                                  .insert({
+                                    sender_id: authUser.id,
+                                    receiver_id: presenceUser.user_id,
+                                    activity: presenceUser.activities?.[0] || 'General',
+                                    status: 'pending',
+                                    sender_email: authUser.email,
+                                  });
+                                if (error) {
+                                  toast.error('Error: ' + error.message);
+                                } else {
+                                  setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
+                                  toast.success('Request sent! ✓');
+                                }
+                              }}
+                              size="sm"
+                              variant="outline"
+                              className="w-full"
+                              style={
+                                acceptedConnections.has(presenceUser.user_id)
+                                  ? {}
+                                  : { borderColor: '#9333EA', color: '#9333EA' }
+                              }
+                              disabled={sentRequests.has(presenceUser.user_id) || acceptedConnections.has(presenceUser.user_id)}
+                            >
+                              <MessageCircle className="h-4 w-4 mr-1" />
+                              {acceptedConnections.has(presenceUser.user_id)
+                                ? 'Already Connected'
+                                : sentRequests.has(presenceUser.user_id)
+                                ? 'Request Sent ✓'
+                                : 'Connect'}
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-card rounded-lg border border-border">
+                    <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="mb-2">No one online right now</h3>
+                    <p className="text-muted-foreground">Check back soon!</p>
+                  </div>
+                )}
+              </TabsContent>
             </Tabs>
 
             {/* Explore Button */}
