@@ -15,15 +15,14 @@ import { ACTIVITIES, CATEGORY_COLORS } from '../data/mockData';
 import { getCategoryForActivity, getColorForActivity, isActivityProfileComplete, getActivitiesInCategory } from '../data/activityHelpers';
 
 export function Settings() {
-  const { user, updateUser, logout } = useAuth();
+  const { user, loading, updateUser, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
-  
+
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-    }
-  }, [user, navigate]);
+    if (loading) return;
+    if (!user) navigate('/login');
+  }, [user, loading, navigate]);
 
   // User profile state
   const [isEditingProfile, setIsEditingProfile] = useState(false);

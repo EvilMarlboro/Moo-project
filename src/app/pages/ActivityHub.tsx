@@ -42,16 +42,15 @@ interface ChatItem {
 }
 
 export function ActivityHub() {
-  const { user, supabaseUserId, updateUser } = useAuth();
+  const { user, loading, supabaseUserId, updateUser } = useAuth();
   const navigate = useNavigate();
   const { matches, addMatch } = useMatches();
 
   // Redirect unauthenticated users to browse hub
   useEffect(() => {
-    if (!user) {
-      navigate('/browse-hub');
-    }
-  }, [user, navigate]);
+    if (loading) return;
+    if (!user) navigate('/browse-hub');
+  }, [user, loading, navigate]);
 
   const [statusMessage, setStatusMessage] = useState(user?.statusMessage || '');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
