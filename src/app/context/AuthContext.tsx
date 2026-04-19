@@ -17,7 +17,7 @@ export interface User {
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: User | null | undefined;
   supabaseUserId: string | null;
   loading: boolean;
   login: (user: User) => void;
@@ -30,9 +30,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined);
   const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const isRefreshingRef = useRef(false);
   const signOutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const establishedUserIdRef = useRef<string | null>(null);

@@ -21,7 +21,7 @@ export function Navbar() {
 
           {/* Navigation */}
           <div className="flex items-center gap-2">
-            {user ? (
+            {user !== null && user !== undefined ? (
               <>
                 {/* Authenticated Navigation */}
                 <Button
@@ -62,7 +62,7 @@ export function Navbar() {
                   </div>
                 </div>
               </>
-            ) : (
+            ) : user === null ? (
               <>
                 {/* Unauthenticated Navigation */}
                 <Button
