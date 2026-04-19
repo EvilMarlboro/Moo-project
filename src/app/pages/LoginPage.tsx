@@ -1,185 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Card } from '../components/ui/card';
-import { Label } from '../components/ui/label';
-import { Shield, Mail, Lock, AlertCircle, CheckCircle, Eye, EyeOff, X, Check } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { user, refreshSession } = useAuth();
-
-  // Navigate away as soon as AuthContext confirms the user is logged in
-  useEffect(() => {
-    if (user) {
-      navigate('/activity-hub', { replace: true });
-    }
-  }, [user, navigate]);
-
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [signupSuccess, setSignupSuccess] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
-  const [resendLoading, setResendLoading] = useState(false);
-  const [resendSuccess, setResendSuccess] = useState(false);
 
-  const hasMinLength = password.length >= 8;
-  const hasLetter = /[a-zA-Z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const passwordRequirementsMet = hasMinLength && hasLetter && hasNumber;
-  const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
-  const showMismatch = mode === 'signup' && confirmPassword.length > 0 && !passwordsMatch;
-  const signupDisabled = mode === 'signup' && (!passwordRequirementsMet || !passwordsMatch);
+  useEffect(() => {
+    if (user) navigate('/activity-hub', { replace: true });
+  }, [user, navigate]);
 
-  const validateEmail = (email: string) => {
-    return email.toLowerCase().endsWith('@usc.edu');
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!validateEmail(email)) {
-      setError('Please use a valid USC email address (@usc.edu)');
-      return;
-    }
-
+  const handleGoogleSignIn = async () => {
     setLoading(true);
-
-    try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
-      if (authError) {
-        if (authError.message?.includes('Email not confirmed')) {
-          setEmailNotConfirmed(true);
-          setError('Please confirm your USC email first. Check your inbox for a verification link.');
-        } else {
-          setError('Invalid email or password');
-        }
-        return;
-      }
-
-      // Navigation handled by useEffect watching user state
-    } catch (err) {
+    setError('');
+    const { error: authError } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://moo-project-ten.vercel.app/activity-hub',
+        queryParams: { hd: 'usc.edu' },
+      },
+    });
+    if (authError) {
       setError('Sign in failed. Please try again.');
-    } finally {
       setLoading(false);
     }
+    // On success the browser redirects — no further action needed here
   };
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!validateEmail(email)) {
-      setError('Please use your USC email (@usc.edu)');
-      return;
-    }
-
-    if (!passwordRequirementsMet) {
-      setError("Password doesn't meet requirements");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { data, error: authError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-      });
-
-      if (authError) {
-        setError(authError.message || 'Failed to create account');
-        return;
-      }
-
-      if (data.session) {
-        await refreshSession();
-        navigate('/profile-setup');
-      } else {
-        setSignupSuccess(true);
-      }
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendConfirmation = async () => {
-    setResendLoading(true);
-    setResendSuccess(false);
-    try {
-      const { error: resendError } = await supabase.auth.resend({
-        type: 'signup',
-        email: email.trim(),
-      });
-      if (resendError) {
-        setError(resendError.message || 'Failed to resend confirmation email');
-      } else {
-        setResendSuccess(true);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Failed to resend confirmation email');
-    } finally {
-      setResendLoading(false);
-    }
-  };
-
-  if (signupSuccess) {
-    return (
-      <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
-          <div className="absolute -top-40 -left-32 w-[480px] h-[480px] rounded-full bg-[#990000]/10 blur-[100px]" />
-          <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full bg-purple-500/12 blur-[100px]" />
-        </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-        >
-          <Card className="max-w-lg w-full p-8 bg-card border-border">
-            <div className="text-center mb-6">
-              <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
-              <h1 className="mb-2">Account Created!</h1>
-              <p className="text-muted-foreground">
-                Please check your USC email inbox (<strong>{email}</strong>) and click the confirmation link before signing in.
-              </p>
-            </div>
-            <Button
-              onClick={() => {
-                setSignupSuccess(false);
-                setMode('login');
-                setPassword('');
-              }}
-              className="w-full"
-              size="lg"
-            >
-              Back to Sign In
-            </Button>
-          </Card>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
@@ -198,168 +51,49 @@ export function LoginPage() {
         <span className="absolute top-[60%] right-[5%] text-2xl opacity-10 rotate-[-5deg]">🎉</span>
         <span className="absolute top-[45%] left-[4%] text-2xl opacity-10 rotate-[8deg]">✨</span>
       </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-sm"
       >
-        <Card className="p-8 bg-card border-border">
-          <div className="text-center mb-8">
-            <Shield className="h-12 w-12 mx-auto mb-3 text-[#990000]" />
-            <h1 className="mb-2">
-              {mode === 'login' ? 'Sign In to MOO' : 'Create MOO Account'}
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              {mode === 'login'
-                ? 'Use your USC email to sign in'
-                : 'Register with your USC email (@usc.edu)'}
-            </p>
+        <Card className="p-10 bg-card border-border text-center">
+          {/* Branding */}
+          <div className="mb-8">
+            <Shield className="h-12 w-12 mx-auto mb-4 text-[#990000]" />
+            <h1 className="mb-1">MOO 🐮</h1>
+            <p className="text-muted-foreground text-sm">Connect with USC students</p>
           </div>
 
+          {/* Error */}
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2">
-              <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm text-red-500">{error}</p>
-                {emailNotConfirmed && (
-                  <div className="mt-2">
-                    {resendSuccess ? (
-                      <p className="text-xs text-green-500">Confirmation email resent! Check your inbox.</p>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={handleResendConfirmation}
-                        disabled={resendLoading}
-                        className="text-xs text-[#990000] hover:text-[#7a0000] underline transition-colors disabled:opacity-50"
-                      >
-                        {resendLoading ? 'Sending...' : 'Resend confirmation email'}
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
+            <p className="mb-4 text-sm text-red-500 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
+              {error}
+            </p>
           )}
 
-          <form onSubmit={mode === 'login' ? handleLogin : handleSignup} className="space-y-4">
-            <div>
-              <Label htmlFor="email">USC Email</Label>
-              <div className="relative mt-1">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="yourname@usc.edu"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
+          {/* Google sign-in button */}
+          <Button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            size="lg"
+            variant="outline"
+            className="w-full gap-3 border-2 hover:bg-secondary/80"
+          >
+            {/* Google logo SVG */}
+            <svg viewBox="0 0 24 24" className="h-5 w-5 flex-shrink-0" aria-hidden>
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+            </svg>
+            {loading ? 'Redirecting…' : 'Sign in with USC Google Account'}
+          </Button>
 
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <div className="relative mt-1">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder={mode === 'signup' ? 'At least 8 characters' : 'Enter your password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={`pl-10 pr-10 ${showMismatch ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-
-            {mode === 'signup' && (
-              <>
-                <div className="space-y-1.5 text-xs">
-                  {[
-                    { met: hasMinLength, label: 'At least 8 characters' },
-                    { met: hasLetter, label: 'Contains a letter (a-z or A-Z)' },
-                    { met: hasNumber, label: 'Contains a number (0-9)' },
-                  ].map((req) => (
-                    <div key={req.label} className="flex items-center gap-2">
-                      {req.met ? (
-                        <Check className="h-3.5 w-3.5 text-green-500" />
-                      ) : (
-                        <X className="h-3.5 w-3.5 text-muted-foreground" />
-                      )}
-                      <span className={req.met ? 'text-green-500' : 'text-muted-foreground'}>
-                        {req.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <div>
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <div className="relative mt-1">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      placeholder="Re-enter your password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className={`pl-10 pr-10 ${showMismatch ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                  {showMismatch && (
-                    <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
-                  )}
-                </div>
-              </>
-            )}
-
-            <Button
-              type={mode === 'login' ? 'button' : 'submit'}
-              onClick={mode === 'login' ? handleLogin : undefined}
-              disabled={loading || signupDisabled}
-              className="w-full bg-[#990000] hover:bg-[#7a0000] text-white"
-              size="lg"
-            >
-              {loading
-                ? (mode === 'login' ? 'Signing in...' : 'Creating account...')
-                : (mode === 'login' ? 'Sign In' : 'Sign Up')}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setMode(mode === 'login' ? 'signup' : 'login');
-                setError('');
-                setEmailNotConfirmed(false);
-                setResendSuccess(false);
-              }}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {mode === 'login'
-                ? "Don't have an account? Sign Up"
-                : 'Already have an account? Sign In'}
-            </button>
-          </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Only <span className="font-medium">@usc.edu</span> accounts are accepted
+          </p>
         </Card>
       </motion.div>
     </div>
