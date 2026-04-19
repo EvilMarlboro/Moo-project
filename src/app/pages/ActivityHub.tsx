@@ -68,6 +68,7 @@ export function ActivityHub() {
   // Modal state
   const [selectedUser, setSelectedUser] = useState<OnlineUser | null>(null);
   const [selectedUserProfile, setSelectedUserProfile] = useState<any>(null);
+  const [selectedUserMatchCount, setSelectedUserMatchCount] = useState<number | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
 
   const fetchAcceptedConnections = async () => {
@@ -321,13 +322,31 @@ export function ActivityHub() {
   const openUserModal = async (presenceUser: OnlineUser) => {
     setSelectedUser(presenceUser);
     setSelectedUserProfile(null);
+    setSelectedUserMatchCount(null);
     setProfileLoading(true);
-    const { data } = await supabase
-      .from('profiles')
-      .select('activity_profiles')
-      .eq('id', presenceUser.user_id)
-      .single();
-    setSelectedUserProfile(data?.activity_profiles || {});
+
+    // Log view (fire-and-forget, ignore if table doesn't exist yet)
+    if (supabaseUserId && supabaseUserId !== presenceUser.user_id) {
+      supabase.from('profile_views').insert({
+        viewer_id: supabaseUserId,
+        viewed_id: presenceUser.user_id,
+      }).then(() => {});
+    }
+
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const [profileResult, matchResult] = await Promise.all([
+      supabase.from('profiles').select('activity_profiles').eq('id', presenceUser.user_id).single(),
+      supabase.from('match_requests')
+        .select('id', { count: 'exact', head: true })
+        .or(`sender_id.eq.${presenceUser.user_id},receiver_id.eq.${presenceUser.user_id}`)
+        .eq('status', 'accepted')
+        .gte('created_at', weekAgo.toISOString()),
+    ]);
+
+    setSelectedUserProfile(profileResult.data?.activity_profiles || {});
+    setSelectedUserMatchCount(matchResult.count ?? 0);
     setProfileLoading(false);
   };
 
@@ -499,6 +518,19 @@ export function ActivityHub() {
                   </DialogDescription>
                 )}
               </DialogHeader>
+
+              {/* Weekly match count */}
+              <div className="flex items-center gap-2 px-1 py-2 mb-1">
+                <div className="flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-lg px-3 py-2 flex-1">
+                  <Heart className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-muted-foreground leading-none mb-0.5">Matches this week</p>
+                    <p className="text-lg font-semibold text-purple-700 leading-none">
+                      {selectedUserMatchCount === null ? '—' : selectedUserMatchCount}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               <div className="py-2">
                 {selectedUser.vibingMode ? (

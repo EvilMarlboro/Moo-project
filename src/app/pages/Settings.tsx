@@ -7,7 +7,7 @@ import { Label } from '../components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { User, Activity, Edit, Trash2, Plus, CheckCircle, X, LogOut, Upload, ImageIcon } from 'lucide-react';
+import { User, Activity, Edit, Trash2, Plus, CheckCircle, X, LogOut, Upload, ImageIcon, BarChart2, Heart, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
 import { AVATAR_OPTIONS } from '../data/avatarImages';
@@ -15,14 +15,21 @@ import { ACTIVITIES, CATEGORY_COLORS } from '../data/mockData';
 import { getCategoryForActivity, getColorForActivity, isActivityProfileComplete, getActivitiesInCategory } from '../data/activityHelpers';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const isUrl = (s: string) => s.startsWith('http://') || s.startsWith('https://') || s.startsWith('blob:');
 
 export function Settings() {
-  const { user, loading, updateUser, logout } = useAuth();
+  const { user, loading, updateUser, logout, supabaseUserId } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Stats state
+  const [weeklyMatchData, setWeeklyMatchData] = useState<{ day: string; matches: number }[]>([]);
+  const [totalWeekMatches, setTotalWeekMatches] = useState(0);
+  const [profileViewCount, setProfileViewCount] = useState<number | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
 
   useEffect(() => {
     if (user === undefined) return;
@@ -48,6 +55,46 @@ export function Settings() {
   const [showAddActivity, setShowAddActivity] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (activeTab !== 'stats' || !supabaseUserId) return;
+    const fetchStats = async () => {
+      setStatsLoading(true);
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+
+      const [matchResult, viewResult] = await Promise.all([
+        supabase
+          .from('match_requests')
+          .select('created_at')
+          .or(`sender_id.eq.${supabaseUserId},receiver_id.eq.${supabaseUserId}`)
+          .eq('status', 'accepted')
+          .gte('created_at', weekAgo.toISOString()),
+        supabase
+          .from('profile_views')
+          .select('id', { count: 'exact', head: true })
+          .eq('viewed_id', supabaseUserId),
+      ]);
+
+      // Build 7-day graph data
+      const days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        return d;
+      });
+      const rows = matchResult.data || [];
+      const graphData = days.map(day => ({
+        day: day.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' }),
+        matches: rows.filter(r => new Date(r.created_at).toDateString() === day.toDateString()).length,
+      }));
+
+      setWeeklyMatchData(graphData);
+      setTotalWeekMatches(rows.length);
+      setProfileViewCount(viewResult.count ?? 0);
+      setStatsLoading(false);
+    };
+    fetchStats();
+  }, [activeTab, supabaseUserId]);
 
   if (!user) {
     return null;
@@ -170,6 +217,10 @@ export function Settings() {
             <TabsTrigger value="activities" className="flex-1">
               <Activity className="h-4 w-4 mr-2" />
               Activity Profiles
+            </TabsTrigger>
+            <TabsTrigger value="stats" className="flex-1">
+              <BarChart2 className="h-4 w-4 mr-2" />
+              Stats
             </TabsTrigger>
           </TabsList>
 
@@ -514,6 +565,63 @@ export function Settings() {
                     )}
                   </div>
                 </Card>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Stats Tab */}
+          <TabsContent value="stats">
+            <div className="space-y-4">
+              {statsLoading ? (
+                <Card className="p-8 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
+                </Card>
+              ) : (
+                <>
+                  {/* Summary cards */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="p-5">
+                      <div className="flex items-center gap-3 mb-1">
+                        <Heart className="h-5 w-5 text-purple-600" />
+                        <span className="text-sm text-muted-foreground">Matches this week</span>
+                      </div>
+                      <p className="text-3xl font-semibold text-purple-700">{totalWeekMatches}</p>
+                    </Card>
+                    <Card className="p-5">
+                      <div className="flex items-center gap-3 mb-1">
+                        <Eye className="h-5 w-5 text-purple-600" />
+                        <span className="text-sm text-muted-foreground">Profile views</span>
+                      </div>
+                      <p className="text-3xl font-semibold text-purple-700">
+                        {profileViewCount === null ? '—' : profileViewCount}
+                      </p>
+                    </Card>
+                  </div>
+
+                  {/* Line graph */}
+                  <Card className="p-6">
+                    <h3 className="mb-4">Matches — Past 7 Days</h3>
+                    <ResponsiveContainer width="100%" height={220}>
+                      <LineChart data={weeklyMatchData} margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(124,58,237,0.1)" />
+                        <XAxis dataKey="day" tick={{ fontSize: 11 }} />
+                        <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+                        <Tooltip
+                          contentStyle={{ borderRadius: '8px', border: '1px solid rgba(124,58,237,0.2)' }}
+                          formatter={(value: number) => [value, 'Matches']}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="matches"
+                          stroke="#7C3AED"
+                          strokeWidth={2.5}
+                          dot={{ fill: '#7C3AED', r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </Card>
+                </>
               )}
             </div>
           </TabsContent>
