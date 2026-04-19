@@ -1,22 +1,21 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from '../components/Navbar';
 import { LoginPrompt } from '../components/LoginPrompt';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Textarea } from '../components/ui/textarea';
-import { Users, Lock, Volume2, Heart, MessageCircle, X, Check } from 'lucide-react';
+import { Users, Volume2, Heart, MessageCircle, X, Check } from 'lucide-react';
 import { Shield, MoreVertical } from 'lucide-react';
 import { CATEGORY_COLORS } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
-import { getCategoriesFromActivities, getActivitiesInCategory, getCategoryForActivity, Category } from '../data/activityHelpers';
+import { getCategoryForActivity, getRequiredFieldsForActivity } from '../data/activityHelpers';
 import { useMatches } from '../context/MatchContext';
 import { Card } from '../components/ui/card';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { supabase } from '../lib/supabase';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
+import { publicAnonKey } from '/utils/supabase/info';
 import { toast } from 'sonner';
 
 interface OnlineUser {
@@ -41,12 +40,15 @@ interface ChatItem {
   updated_at: string;
 }
 
+function formatFieldName(field: string): string {
+  return field.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+}
+
 export function ActivityHub() {
-  const { user, loading, supabaseUserId, updateUser } = useAuth();
+  const { user, supabaseUserId, updateUser } = useAuth();
   const navigate = useNavigate();
   const { matches, addMatch } = useMatches();
 
-  // Redirect unauthenticated users to browse hub
   useEffect(() => {
     if (user === undefined) return;
     if (user === null) navigate('/');
@@ -62,7 +64,10 @@ export function ActivityHub() {
   const [acceptedConnections, setAcceptedConnections] = useState<Set<string>>(new Set());
   const [chats, setChats] = useState<ChatItem[]>([]);
 
-  const serverBase = `https://${projectId}.supabase.co/functions/v1/make-server-5eb2b086`;
+  // Modal state
+  const [selectedUser, setSelectedUser] = useState<OnlineUser | null>(null);
+  const [selectedUserProfile, setSelectedUserProfile] = useState<any>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
 
   const fetchAcceptedConnections = async () => {
     if (!supabaseUserId) return;
@@ -78,7 +83,6 @@ export function ActivityHub() {
     }
   };
 
-  // Fetch match requests from Supabase
   const fetchMatchRequests = async () => {
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) return;
@@ -100,7 +104,6 @@ export function ActivityHub() {
       return;
     }
 
-    // Fetch sender profiles from profiles table
     const enriched = await Promise.all(
       data.map(async (req: any) => {
         try {
@@ -151,88 +154,37 @@ export function ActivityHub() {
   useEffect(() => {
     if (!supabaseUserId) return;
 
-    // Initial load
     fetchMatchRequests();
     fetchAcceptedConnections();
 
-    // Single realtime channel for all match request events
     const channel = supabase
       .channel('match-requests-' + supabaseUserId)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'match_requests',
-          filter: `receiver_id=eq.${supabaseUserId}`,
-        },
-        (payload) => {
-          console.log('New match request received:', payload);
-          fetchMatchRequests();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'match_requests',
-          filter: `receiver_id=eq.${supabaseUserId}`,
-        },
-        (payload) => {
-          console.log('Match request updated:', payload);
-          fetchMatchRequests();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'match_requests',
-          filter: `receiver_id=eq.${supabaseUserId}`,
-        },
-        (payload) => {
-          console.log('Match request deleted:', payload);
-          fetchMatchRequests();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'match_requests',
-          filter: `sender_id=eq.${supabaseUserId}`,
-        },
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_requests', filter: `receiver_id=eq.${supabaseUserId}` },
+        () => fetchMatchRequests())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'match_requests', filter: `receiver_id=eq.${supabaseUserId}` },
+        () => fetchMatchRequests())
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'match_requests', filter: `receiver_id=eq.${supabaseUserId}` },
+        () => fetchMatchRequests())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'match_requests', filter: `sender_id=eq.${supabaseUserId}` },
         async (payload: any) => {
-          console.log('Sent request updated:', payload);
           if (payload.new.status === 'accepted') {
             fetchAcceptedConnections();
             const { data: chat } = await supabase
               .from('chats')
               .select('id')
-              .or(
-                `and(user1_id.eq.${supabaseUserId},user2_id.eq.${payload.new.receiver_id}),and(user1_id.eq.${payload.new.receiver_id},user2_id.eq.${supabaseUserId})`
-              )
+              .or(`and(user1_id.eq.${supabaseUserId},user2_id.eq.${payload.new.receiver_id}),and(user1_id.eq.${payload.new.receiver_id},user2_id.eq.${supabaseUserId})`)
               .maybeSingle();
             if (chat) {
               toast.success('Your request was accepted! Starting chat...');
               navigate('/chat/' + chat.id);
             }
           }
-        }
-      )
-      .subscribe((status) => {
-        console.log('Match requests subscription status:', status);
-      });
+        })
+      .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, [supabaseUserId, navigate]);
 
-  // Fetch chats from Supabase
   const fetchChats = async () => {
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) return;
@@ -243,31 +195,20 @@ export function ActivityHub() {
       .or(`user1_id.eq.${authUser.id},user2_id.eq.${authUser.id}`)
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.log('Error fetching chats:', error);
-      return;
-    }
+    if (error) { console.log('Error fetching chats:', error); return; }
+    if (!data || data.length === 0) { setChats([]); return; }
 
-    if (!data || data.length === 0) {
-      setChats([]);
-      return;
-    }
-
-    // For each chat, get partner profile from profiles table
     const enriched = await Promise.all(
       data.map(async (chat: any) => {
         const partnerId = chat.user1_id === authUser.id ? chat.user2_id : chat.user1_id;
-
         let partnerName = 'USC Student';
         let partnerAvatar = '👤';
-        
         try {
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('display_name, avatar')
             .eq('id', partnerId)
             .single();
-
           if (profile && !profileError) {
             partnerName = profile.display_name || 'USC Student';
             partnerAvatar = profile.avatar || '👤';
@@ -275,7 +216,6 @@ export function ActivityHub() {
         } catch (err) {
           console.log('Error fetching partner profile:', err);
         }
-
         return {
           id: chat.id,
           partner_id: partnerId,
@@ -288,141 +228,54 @@ export function ActivityHub() {
     );
 
     setChats(enriched);
-    
-    // Sync matches with MatchContext - add all chat partners to matches
-    enriched.forEach(chat => {
-      addMatch(chat.partner_id, chat.activity);
-    });
+    enriched.forEach(chat => addMatch(chat.partner_id, chat.activity));
   };
 
-  useEffect(() => {
-    fetchChats();
-  }, [supabaseUserId]);
+  useEffect(() => { fetchChats(); }, [supabaseUserId]);
 
-  // Fetch sent match requests from Supabase
   const fetchSentRequests = async () => {
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) return;
-
     const { data, error } = await supabase
       .from('match_requests')
       .select('receiver_id')
       .eq('sender_id', authUser.id)
       .eq('status', 'pending');
-
-    if (error) {
-      console.log('Error fetching sent requests:', error);
-      return;
-    }
-
-    if (data && data.length > 0) {
-      const receiverIds = new Set(data.map((req: any) => req.receiver_id));
-      setSentRequests(receiverIds);
-    } else {
-      setSentRequests(new Set());
-    }
+    if (error) { console.log('Error fetching sent requests:', error); return; }
+    setSentRequests(data && data.length > 0
+      ? new Set(data.map((req: any) => req.receiver_id))
+      : new Set());
   };
 
-  // Load sent requests on mount and subscribe to changes
   useEffect(() => {
     if (!supabaseUserId) return;
-
     fetchSentRequests();
-
-    // Subscribe to changes in sent requests
     const channel = supabase
       .channel('sent-requests-' + supabaseUserId)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'match_requests',
-          filter: `sender_id=eq.${supabaseUserId}`,
-        },
-        () => {
-          console.log('Sent requests changed');
-          fetchSentRequests();
-        }
-      )
-      .subscribe((status) => {
-        console.log('Sent requests subscription status:', status);
-      });
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'match_requests', filter: `sender_id=eq.${supabaseUserId}` },
+        () => fetchSentRequests())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [supabaseUserId]);
 
-  // Listen for new chats via Supabase Realtime
   useEffect(() => {
     if (!supabaseUserId) return;
-
     const channel = supabase
       .channel('chats-panel')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'chats',
-        },
-        () => {
-          fetchChats();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'chats',
-        },
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chats' }, () => fetchChats())
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'chats' },
         (payload) => {
-          // Remove deleted chat from list instantly
           setChats(prev => prev.filter(c => c.id !== payload.old.id));
           toast.info('A chat has been removed');
-        }
-      )
+        })
       .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, [supabaseUserId]);
-
-  // All available categories for browsing
-  const allCategories: Category[] = ['sports', 'gaming', 'studying', 'campusEvents'];
-  
-  // Get only categories that have enabled activities (for authenticated users)
-  const enabledCategories = useMemo(() => {
-    if (!user?.enabledActivities.length) return [];
-    return getCategoriesFromActivities(user.enabledActivities);
-  }, [user?.enabledActivities]);
-
-  // Use all categories if not authenticated, in vibing mode, or use enabled categories
-  const displayCategories = (!user || user.vibingMode) ? allCategories : enabledCategories;
-
-  const [activeCategory, setActiveCategory] = useState<Category | 'vibing'>(
-    displayCategories[0] || 'sports'
-  );
-  const [activeActivity, setActiveActivity] = useState<string | 'all'>('all');
-
-  // Sync activeCategory when user's enabled categories load after session restore
-  useEffect(() => {
-    if (enabledCategories.length > 0) {
-      setActiveCategory(prev =>
-        prev === 'vibing' ? prev : enabledCategories.includes(prev as Category) ? prev : enabledCategories[0]
-      );
-    }
-  }, [enabledCategories]);
 
   // Subscribe to Supabase Realtime Presence
   useEffect(() => {
     if (!user || !supabaseUserId) return;
-
     const channel = supabase.channel('online-users');
-
     channel
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState();
@@ -430,18 +283,13 @@ export function ActivityHub() {
         setOnlineUsers(users);
       })
       .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user?.id, supabaseUserId]);
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id, supabaseUserId]); // Only recreate if user ID changes, not on every user update
-
-  // Track presence when user or user data changes
+  // Track presence when user data changes
   useEffect(() => {
     if (!user || !supabaseUserId) return;
-
     const channel = supabase.channel('online-users');
-    
     const trackPresence = async () => {
       const categories = Array.from(
         new Set(
@@ -450,11 +298,10 @@ export function ActivityHub() {
             .filter(Boolean)
         )
       );
-
       await channel.track({
         user_id: supabaseUserId,
         email: user.email,
-        username: user.username, // This is display_name from profiles table
+        username: user.username,
         avatar: user.avatar || '👤',
         genderSymbol: user.genderSymbol || '',
         activities: user.enabledActivities || [],
@@ -464,39 +311,59 @@ export function ActivityHub() {
         online_at: new Date().toISOString(),
       });
     };
-
     trackPresence();
+    return () => { channel.untrack(); };
+  }, [user, supabaseUserId]);
 
-    return () => {
-      channel.untrack();
-    };
-  }, [user, supabaseUserId]); // Re-track whenever user data changes
+  const allOtherUsers = onlineUsers.filter(u => u.user_id !== supabaseUserId);
 
-  // Helper function to check if activity is enabled
-  const isActivityEnabled = (activity: string) => {
-    if (!user || user.vibingMode) return true;
-    return user?.enabledActivities.includes(activity);
+  const openUserModal = async (presenceUser: OnlineUser) => {
+    setSelectedUser(presenceUser);
+    setSelectedUserProfile(null);
+    setProfileLoading(true);
+    const { data } = await supabase
+      .from('profiles')
+      .select('activity_profiles')
+      .eq('id', presenceUser.user_id)
+      .single();
+    setSelectedUserProfile(data?.activity_profiles || {});
+    setProfileLoading(false);
   };
 
-  // Get all activities in the current category (flattened)
-  const currentCategoryActivities = activeCategory === 'vibing' ? [] : getActivitiesInCategory(activeCategory as Category);
-  const enabledActivitiesInCategory = (user && !user.vibingMode)
-    ? currentCategoryActivities.filter(isActivityEnabled)
-    : currentCategoryActivities;
+  const handleConnect = async (presenceUser: OnlineUser) => {
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) return;
 
-  // Filter real online users (exclude self, filter by category and activity)
-  const filteredUsers = useMemo(() => {
-    const others = onlineUsers.filter((u) => u.user_id !== supabaseUserId);
-    // Vibing tab shows everyone
-    if (activeCategory === 'vibing') return others;
-    return others.filter((u) => {
-      // Vibing users show in all categories
-      const inCategory = u.vibingMode || (u.categories || []).includes(activeCategory);
-      if (!inCategory) return false;
-      if (activeActivity === 'all') return true;
-      return (u.activities || []).includes(activeActivity);
-    });
-  }, [onlineUsers, supabaseUserId, activeCategory, activeActivity]);
+    const { data: existing } = await supabase
+      .from('match_requests')
+      .select('id, status')
+      .eq('sender_id', authUser.id)
+      .eq('receiver_id', presenceUser.user_id)
+      .maybeSingle();
+
+    if (existing) {
+      if (existing.status === 'pending') toast.info('Request already sent!');
+      else if (existing.status === 'accepted') toast.success('You are already connected!');
+      setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
+      return;
+    }
+
+    const { error } = await supabase
+      .from('match_requests')
+      .insert({
+        sender_id: authUser.id,
+        receiver_id: presenceUser.user_id,
+        activity: presenceUser.activities?.[0] || 'General',
+        status: 'pending',
+        sender_email: authUser.email,
+      });
+    if (error) {
+      toast.error('Error: ' + error.message);
+    } else {
+      setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
+      toast.success('Request sent! ✓');
+    }
+  };
 
   const handleSaveStatusMessage = () => {
     updateUser({ statusMessage });
@@ -504,25 +371,16 @@ export function ActivityHub() {
   };
 
   const handleAcceptMatch = async (requestId: string) => {
-    if (!user) {
-      setIsLoginPromptOpen(true);
-      return;
-    }
-    
+    if (!user) { setIsLoginPromptOpen(true); return; }
     const request = matchRequests.find(req => req.id === requestId);
     if (!request) return;
 
-    // Update request status to accepted
     const { error } = await supabase
       .from('match_requests')
       .update({ status: 'accepted' })
       .eq('id', requestId);
 
-    if (error) {
-      console.log('Error accepting match request:', error);
-      toast.error(error.message);
-      return;
-    }
+    if (error) { toast.error(error.message); return; }
 
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) return;
@@ -530,7 +388,6 @@ export function ActivityHub() {
     const senderId = request.sender_id;
     const activity = request.activities?.[0] || request.activity || '';
 
-    // Check if chat already exists between these two users
     const { data: existingChat } = await supabase
       .from('chats')
       .select('id')
@@ -538,25 +395,15 @@ export function ActivityHub() {
       .maybeSingle();
 
     let chatId: string;
-
     if (existingChat) {
       chatId = existingChat.id;
     } else {
       const { data: newChat, error: chatError } = await supabase
         .from('chats')
-        .insert({
-          user1_id: authUser.id,
-          user2_id: senderId,
-          activity,
-        })
+        .insert({ user1_id: authUser.id, user2_id: senderId, activity })
         .select()
         .single();
-
-      if (chatError || !newChat) {
-        console.log('Error creating chat:', chatError);
-        toast.error('Failed to create chat room');
-        return;
-      }
+      if (chatError || !newChat) { toast.error('Failed to create chat room'); return; }
       chatId = newChat.id;
     }
 
@@ -567,42 +414,24 @@ export function ActivityHub() {
   };
 
   const handleDeclineMatch = async (requestId: string) => {
-    if (!user) {
-      setIsLoginPromptOpen(true);
-      return;
-    }
-    
+    if (!user) { setIsLoginPromptOpen(true); return; }
     const { error } = await supabase
       .from('match_requests')
       .update({ status: 'declined' })
       .eq('id', requestId);
-
-    if (error) {
-      console.log('Error declining match request:', error);
-      alert(error.message);
-      return;
-    }
-
+    if (error) { toast.error(error.message); return; }
     setMatchRequests(prev => prev.filter(req => req.id !== requestId));
   };
 
   const toggleRequestDetails = (requestId: string) => {
     setExpandedRequests(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(requestId)) {
-        newSet.delete(requestId);
-      } else {
-        newSet.add(requestId);
-      }
+      if (newSet.has(requestId)) newSet.delete(requestId);
+      else newSet.add(requestId);
       return newSet;
     });
   };
 
-  const handleUnauthenticatedAction = () => {
-    setIsLoginPromptOpen(true);
-  };
-
-  // Session still restoring — show spinner
   if (user === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -611,83 +440,174 @@ export function ActivityHub() {
     );
   }
 
-  // Handle authenticated user with no activities
-  if (user && enabledCategories.length === 0 && !user.vibingMode) {
-    return (
-      <div className="min-h-screen">
-        <Navbar />
-        <div className="container mx-auto px-4 py-12 max-w-2xl text-center">
-          <Lock className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          <h1 className="mb-4">No Activities Enabled</h1>
-          <p className="text-muted-foreground mb-6">
-            You need to select and set up activities before you can access the Activity Hub
-          </p>
-          <Button onClick={() => navigate('/activity-selection')} size="lg">
-            Select Activities
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // Group activities by category for modal display
+  const groupActivitiesByCategory = (activities: string[]) => {
+    const groups: Record<string, string[]> = {};
+    for (const activity of activities) {
+      const cat = getCategoryForActivity(activity) || 'other';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(activity);
+    }
+    return groups;
+  };
 
-  // AUTHENTICATED VIEW
   return (
     <div className="min-h-screen">
       <Navbar />
       <LoginPrompt open={isLoginPromptOpen} onOpenChange={setIsLoginPromptOpen} />
 
+      {/* User profile modal */}
+      <Dialog open={!!selectedUser} onOpenChange={(open) => { if (!open) { setSelectedUser(null); setSelectedUserProfile(null); } }}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          {selectedUser && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="relative">
+                    <Avatar className="w-20 h-20 border-2 border-purple-300">
+                      <AvatarFallback className="text-4xl bg-purple-50">
+                        {selectedUser.avatar || '👤'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <DialogTitle className="text-xl">{selectedUser.username}</DialogTitle>
+                      {selectedUser.genderSymbol && (
+                        <span
+                          className="text-xl"
+                          style={{
+                            color: selectedUser.genderSymbol === '♂' ? '#3B82F6'
+                              : selectedUser.genderSymbol === '♀' ? '#EC4899'
+                              : '#9333EA',
+                          }}
+                        >
+                          {selectedUser.genderSymbol}
+                        </span>
+                      )}
+                      <Shield className="h-4 w-4 text-[#990000]" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">USC Student</p>
+                  </div>
+                </div>
+                {selectedUser.statusMessage && (
+                  <DialogDescription className="italic text-left">
+                    "{selectedUser.statusMessage}"
+                  </DialogDescription>
+                )}
+              </DialogHeader>
+
+              <div className="py-2">
+                {selectedUser.vibingMode ? (
+                  <div className="p-3 rounded-lg bg-purple-50 border border-purple-200 mb-4">
+                    <p className="text-sm font-medium text-purple-700">🎵 Vibing — open to anything!</p>
+                  </div>
+                ) : (
+                  <>
+                    {profileLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-purple-300 border-t-transparent" />
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {Object.entries(groupActivitiesByCategory(selectedUser.activities || [])).map(([category, activities]) => {
+                          const color = CATEGORY_COLORS[category as keyof typeof CATEGORY_COLORS] || '#9333EA';
+                          const categoryLabel = category === 'campusEvents' ? 'Campus Events'
+                            : category.charAt(0).toUpperCase() + category.slice(1);
+                          return (
+                            <div key={category}>
+                              <h4 className="text-sm font-semibold mb-2 uppercase tracking-wide" style={{ color }}>
+                                {categoryLabel}
+                              </h4>
+                              <div className="space-y-3">
+                                {activities.map(activity => {
+                                  const profile = selectedUserProfile?.[activity];
+                                  const fields = getRequiredFieldsForActivity(activity);
+                                  return (
+                                    <div key={activity} className="p-3 rounded-lg border" style={{ borderColor: color + '40', backgroundColor: color + '08' }}>
+                                      <p className="font-medium text-sm mb-1" style={{ color }}>{activity}</p>
+                                      {fields.length > 0 && profile ? (
+                                        <div className="grid grid-cols-2 gap-1">
+                                          {fields.map(field => profile[field] ? (
+                                            <div key={field}>
+                                              <span className="text-xs text-muted-foreground">{formatFieldName(field)}: </span>
+                                              <span className="text-xs font-medium">{profile[field]}</span>
+                                            </div>
+                                          ) : null)}
+                                        </div>
+                                      ) : fields.length > 0 ? (
+                                        <p className="text-xs text-muted-foreground">No profile details yet</p>
+                                      ) : null}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <DialogFooter>
+                <Button
+                  className="w-full"
+                  style={
+                    acceptedConnections.has(selectedUser.user_id)
+                      ? {}
+                      : { backgroundColor: '#9333EA', color: 'white' }
+                  }
+                  disabled={sentRequests.has(selectedUser.user_id) || acceptedConnections.has(selectedUser.user_id)}
+                  onClick={() => handleConnect(selectedUser)}
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  {acceptedConnections.has(selectedUser.user_id)
+                    ? 'Already Connected'
+                    : sentRequests.has(selectedUser.user_id)
+                    ? 'Request Sent ✓'
+                    : 'Connect'}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <div className="container mx-auto px-4 py-6">
-        {/* Header */}
         <div className="mb-6">
-          <div>
-            <h1 className="mb-2">Activity Hub</h1>
-            <p className="text-muted-foreground">
-              Find USC students available right now for your favorite activities
-            </p>
-          </div>
+          <h1 className="mb-2">Activity Hub</h1>
+          <p className="text-muted-foreground">
+            Find USC students available right now for your favorite activities
+          </p>
         </div>
 
-        {/* Main Layout with Sidebar */}
         <div className="flex gap-6">
           {/* Left Sidebar */}
           <div className="w-64 flex-shrink-0 space-y-6">
-            {/* Match Requests Section */}
+            {/* Match Requests */}
             <Card className="p-4 border-2 border-border">
               <div className="flex items-center gap-2 mb-4">
                 <Heart className="h-5 w-5 text-pink-500" />
                 <h3 className="text-lg">Match Requests</h3>
                 {matchRequests.length > 0 && (
-                  <Badge variant="destructive" className="ml-auto">
-                    {matchRequests.length}
-                  </Badge>
+                  <Badge variant="destructive" className="ml-auto">{matchRequests.length}</Badge>
                 )}
               </div>
-
               <div className="space-y-3">
                 {matchRequests.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    No match requests yet
-                  </p>
+                  <p className="text-sm text-muted-foreground text-center py-4">No match requests yet</p>
                 ) : (
                   matchRequests.map(request => {
                     const categoryColor = CATEGORY_COLORS[request.category as keyof typeof CATEGORY_COLORS] || '#6B7280';
                     const isExpanded = expandedRequests.has(request.id);
-                    
                     return (
-                      <Card 
-                        key={request.id} 
-                        className="p-3 bg-secondary/30 border-2"
-                        style={{ borderColor: categoryColor }}
-                      >
+                      <Card key={request.id} className="p-3 bg-secondary/30 border-2" style={{ borderColor: categoryColor }}>
                         <div className="flex items-start gap-3 mb-2">
-                          <Avatar 
-                            className="w-12 h-12 border-2" 
-                            style={{ borderColor: categoryColor }}
-                          >
-                            <AvatarFallback 
-                              className="text-2xl"
-                              style={{ backgroundColor: categoryColor + '20' }}
-                            >
+                          <Avatar className="w-12 h-12 border-2" style={{ borderColor: categoryColor }}>
+                            <AvatarFallback className="text-2xl" style={{ backgroundColor: categoryColor + '20' }}>
                               {request.avatar}
                             </AvatarFallback>
                           </Avatar>
@@ -695,13 +615,7 @@ export function ActivityHub() {
                             <div className="flex items-center gap-1.5 mb-0.5">
                               <h4 className="text-sm font-medium truncate">{request.username}</h4>
                               {request.genderSymbol && (
-                                <span 
-                                  className="text-sm flex-shrink-0" 
-                                  style={{ 
-                                    color: request.genderSymbol === '♂' ? '#3B82F6' : 
-                                           request.genderSymbol === '♀' ? '#EC4899' : categoryColor 
-                                  }}
-                                >
+                                <span className="text-sm flex-shrink-0" style={{ color: request.genderSymbol === '♂' ? '#3B82F6' : request.genderSymbol === '♀' ? '#EC4899' : categoryColor }}>
                                   {request.genderSymbol}
                                 </span>
                               )}
@@ -709,59 +623,33 @@ export function ActivityHub() {
                             </div>
                             <p className="text-xs text-muted-foreground">{request.activities?.[0]}</p>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0 flex-shrink-0"
-                            onClick={() => toggleRequestDetails(request.id)}
-                          >
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 flex-shrink-0" onClick={() => toggleRequestDetails(request.id)}>
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </div>
-
                         {isExpanded && (
                           <>
                             {request.activities?.length > 1 && (
-                              <div className="mb-2">
-                                <div className="flex flex-wrap gap-1 items-center">
-                                  {request.activities.map((activity: string, index: number) => (
-                                    <span key={index}>
-                                      <span className="font-medium text-xs" style={{ color: categoryColor }}>
-                                        {activity}
-                                      </span>
-                                      {index < request.activities.length - 1 && (
-                                        <span className="text-muted-foreground mx-1 text-xs">•</span>
-                                      )}
-                                    </span>
-                                  ))}
-                                </div>
+                              <div className="mb-2 flex flex-wrap gap-1">
+                                {request.activities.map((activity: string, index: number) => (
+                                  <span key={index}>
+                                    <span className="font-medium text-xs" style={{ color: categoryColor }}>{activity}</span>
+                                    {index < request.activities.length - 1 && <span className="text-muted-foreground mx-1 text-xs">•</span>}
+                                  </span>
+                                ))}
                               </div>
                             )}
                             {request.statusMessage && (
-                              <p className="text-xs text-muted-foreground mb-2 italic">
-                                "{request.statusMessage}"
-                              </p>
+                              <p className="text-xs text-muted-foreground mb-2 italic">"{request.statusMessage}"</p>
                             )}
                           </>
                         )}
-
                         <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            className="flex-1 bg-green-500 hover:bg-green-600 h-8"
-                            onClick={() => handleAcceptMatch(request.id)}
-                          >
-                            <Check className="h-3 w-3 mr-1" />
-                            Accept
+                          <Button size="sm" className="flex-1 bg-green-500 hover:bg-green-600 h-8" onClick={() => handleAcceptMatch(request.id)}>
+                            <Check className="h-3 w-3 mr-1" />Accept
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex-1 h-8"
-                            onClick={() => handleDeclineMatch(request.id)}
-                          >
-                            <X className="h-3 w-3 mr-1" />
-                            Decline
+                          <Button size="sm" variant="outline" className="flex-1 h-8" onClick={() => handleDeclineMatch(request.id)}>
+                            <X className="h-3 w-3 mr-1" />Decline
                           </Button>
                         </div>
                       </Card>
@@ -771,38 +659,23 @@ export function ActivityHub() {
               </div>
             </Card>
 
-            {/* Chats Section */}
+            {/* Chats */}
             <Card className="p-4 border-2 border-border">
               <div className="flex items-center gap-2 mb-4">
                 <MessageCircle className="h-5 w-5 text-blue-500" />
                 <h3 className="text-lg">Chats</h3>
               </div>
-
               <div className="space-y-2">
                 {chats.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    No active chats
-                  </p>
+                  <p className="text-sm text-muted-foreground text-center py-4">No active chats</p>
                 ) : (
                   chats.map(chat => {
                     const categoryColor = CATEGORY_COLORS[getCategoryForActivity(chat.activity) as keyof typeof CATEGORY_COLORS] || '#6B7280';
-                    
                     return (
-                      <Card 
-                        key={chat.id} 
-                        className="p-3 bg-secondary/30 border-2 cursor-pointer hover:bg-secondary/50 transition-colors"
-                        style={{ borderColor: categoryColor }}
-                        onClick={() => navigate(`/chat/${chat.id}`)}
-                      >
+                      <Card key={chat.id} className="p-3 bg-secondary/30 border-2 cursor-pointer hover:bg-secondary/50 transition-colors" style={{ borderColor: categoryColor }} onClick={() => navigate(`/chat/${chat.id}`)}>
                         <div className="flex items-center gap-3">
-                          <Avatar 
-                            className="w-10 h-10 border-2" 
-                            style={{ borderColor: categoryColor }}
-                          >
-                            <AvatarFallback 
-                              className="text-xl"
-                              style={{ backgroundColor: categoryColor + '20' }}
-                            >
+                          <Avatar className="w-10 h-10 border-2" style={{ borderColor: categoryColor }}>
+                            <AvatarFallback className="text-xl" style={{ backgroundColor: categoryColor + '20' }}>
                               {chat.partner_avatar}
                             </AvatarFallback>
                           </Avatar>
@@ -825,429 +698,147 @@ export function ActivityHub() {
 
           {/* Main Content */}
           <div className="flex-1 min-w-0">
-            <Tabs value={activeCategory} onValueChange={(v) => {
-              setActiveCategory(v as Category | 'vibing');
-              setActiveActivity('all');
-            }}>
-              <TabsList className="w-full justify-start mb-6 bg-gradient-to-r from-purple-100 to-pink-100 p-2 h-auto rounded-2xl border-2 border-purple-200">
-                {displayCategories.map((categoryKey) => {
-                  const color = CATEGORY_COLORS[categoryKey];
-                  const categoryName = categoryKey === 'campusEvents' ? 'Campus Events' :
-                                       categoryKey === 'social' ? 'Social & Hangouts' :
-                                       categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
+            {/* Header row */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="font-medium">
+                  {allOtherUsers.length} {allOtherUsers.length === 1 ? 'person' : 'people'} online now
+                </span>
+              </div>
+
+              {/* Status message dialog */}
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Volume2 className="h-4 w-4" />
+                    {user?.statusMessage ? 'Edit Status' : 'Set Status'}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Set Your Status Message</DialogTitle>
+                    <DialogDescription>
+                      This message will be visible to other users on your profile card.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="py-4">
+                    <Textarea
+                      value={statusMessage}
+                      onChange={(e) => setStatusMessage(e.target.value)}
+                      placeholder="e.g., Looking for a study buddy for CSCI 104!"
+                      maxLength={150}
+                      rows={3}
+                      className="resize-none"
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">{statusMessage.length}/150 characters</p>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={handleSaveStatusMessage}>Save Status</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            {/* Users Grid */}
+            {allOtherUsers.length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {allOtherUsers.map(presenceUser => {
+                  const primaryCategory = presenceUser.categories?.[0];
+                  const cardColor = CATEGORY_COLORS[primaryCategory as keyof typeof CATEGORY_COLORS] || '#9333EA';
+                  const categoryLabels = (presenceUser.categories || []).map(c =>
+                    c === 'campusEvents' ? 'Campus Events' : c.charAt(0).toUpperCase() + c.slice(1)
+                  );
 
                   return (
-                    <TabsTrigger
-                      key={categoryKey}
-                      value={categoryKey}
-                      className="data-[state=active]:bg-white data-[state=active]:shadow-md transition-all text-base px-6 py-3 rounded-xl font-semibold"
-                      style={{
-                        color: activeCategory === categoryKey ? color : '#6B7280',
-                        borderColor: activeCategory === categoryKey ? color : 'transparent'
-                      }}
+                    <Card
+                      key={presenceUser.user_id}
+                      className="p-4 bg-gradient-to-br from-white to-purple-50 border-2 hover:scale-[1.02] transition-all hover:shadow-xl cursor-pointer"
+                      style={{ borderColor: cardColor, boxShadow: `0 4px 20px ${cardColor}20` }}
+                      onClick={() => openUserModal(presenceUser)}
                     >
-                      {categoryName}
-                    </TabsTrigger>
+                      <div className="flex items-start gap-3">
+                        <div className="relative flex-shrink-0">
+                          <Avatar className="w-14 h-14 border-2" style={{ borderColor: cardColor }}>
+                            <AvatarFallback className="text-2xl" style={{ backgroundColor: cardColor + '20' }}>
+                              {presenceUser.avatar || '👤'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card" />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <h3 className="text-sm font-semibold truncate">{presenceUser.username}</h3>
+                            {presenceUser.genderSymbol && (
+                              <span
+                                className="text-sm flex-shrink-0"
+                                style={{
+                                  color: presenceUser.genderSymbol === '♂' ? '#3B82F6'
+                                    : presenceUser.genderSymbol === '♀' ? '#EC4899'
+                                    : cardColor,
+                                }}
+                              >
+                                {presenceUser.genderSymbol}
+                              </span>
+                            )}
+                            <Shield className="h-3 w-3 text-[#990000] flex-shrink-0" />
+                          </div>
+
+                          {/* Category summary */}
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {presenceUser.vibingMode ? (
+                              <span className="text-xs font-medium text-purple-600">🎵 Vibing</span>
+                            ) : categoryLabels.length > 0 ? (
+                              <span className="text-xs text-muted-foreground">
+                                {categoryLabels.join(' • ')}
+                              </span>
+                            ) : null}
+                          </div>
+
+                          {/* Status message */}
+                          {presenceUser.statusMessage && (
+                            <p className="text-xs text-muted-foreground italic line-clamp-1 mb-2">
+                              "{presenceUser.statusMessage}"
+                            </p>
+                          )}
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full h-7 text-xs"
+                            style={
+                              acceptedConnections.has(presenceUser.user_id)
+                                ? {}
+                                : { borderColor: cardColor, color: cardColor }
+                            }
+                            disabled={sentRequests.has(presenceUser.user_id) || acceptedConnections.has(presenceUser.user_id)}
+                            onClick={(e) => { e.stopPropagation(); handleConnect(presenceUser); }}
+                          >
+                            <MessageCircle className="h-3 w-3 mr-1" />
+                            {acceptedConnections.has(presenceUser.user_id)
+                              ? 'Already Connected'
+                              : sentRequests.has(presenceUser.user_id)
+                              ? 'Request Sent ✓'
+                              : 'Connect'}
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
                   );
                 })}
-                <TabsTrigger
-                  value="vibing"
-                  className="data-[state=active]:shadow-md transition-all text-base px-6 py-3 rounded-xl font-semibold data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white"
-                  style={{
-                    color: activeCategory === 'vibing' ? undefined : '#9333EA',
-                  }}
-                >
-                  Vibing? 🎯
-                </TabsTrigger>
-              </TabsList>
+              </div>
+            ) : (
+              <div className="text-center py-16 bg-card rounded-lg border border-border">
+                <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="mb-2">No one else online right now</h3>
+                <p className="text-muted-foreground">Check back soon or invite a friend!</p>
+              </div>
+            )}
 
-              {displayCategories.map(categoryKey => {
-                const categoryColor = CATEGORY_COLORS[categoryKey];
-
-                return (
-                  <TabsContent key={categoryKey} value={categoryKey} className="mt-0">
-                    {/* Activity Sub-tabs */}
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <h3>Select Activity</h3>
-                          <Badge variant="outline" style={{ borderColor: categoryColor, color: categoryColor }}>
-                            {enabledActivitiesInCategory.length} enabled
-                          </Badge>
-                        </div>
-                        
-                        {/* Status Message Button */}
-                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="outline" 
-                              size="icon"
-                              className="flex-shrink-0 h-12 w-12"
-                              title="Set status message"
-                            >
-                              <Volume2 className="h-7 w-7" style={{ color: categoryColor }} />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Set Your Status Message</DialogTitle>
-                              <DialogDescription>
-                                This message will be visible to other users on your profile card.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="py-4">
-                              <Textarea
-                                value={statusMessage}
-                                onChange={(e) => setStatusMessage(e.target.value)}
-                                placeholder="e.g., Looking for a study buddy for CSCI 104!"
-                                maxLength={150}
-                                rows={3}
-                                className="resize-none"
-                              />
-                              <p className="text-xs text-muted-foreground mt-2">
-                                {statusMessage.length}/150 characters
-                              </p>
-                            </div>
-                            <DialogFooter>
-                              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                                Cancel
-                              </Button>
-                              <Button onClick={handleSaveStatusMessage}>
-                                Save Status
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          variant={activeActivity === 'all' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setActiveActivity('all')}
-                          style={activeActivity === 'all' ? { backgroundColor: categoryColor } : {}}
-                        >
-                          All Activities
-                        </Button>
-                        {enabledActivitiesInCategory.map(activity => {
-                          return (
-                            <Button
-                              key={activity}
-                              variant={activeActivity === activity ? 'default' : 'outline'}
-                              size="sm"
-                              onClick={() => setActiveActivity(activity)}
-                              style={activeActivity === activity ? { backgroundColor: categoryColor } : {}}
-                            >
-                              {activity}
-                            </Button>
-                          );
-                        })}
-                      </div>
-
-                      {enabledActivitiesInCategory.length < currentCategoryActivities.length && (
-                        <p className="text-sm text-muted-foreground mt-2">
-                          Want more activities? Add them in Settings.
-                        </p>
-                      )}
-                    </div>
-
-                    {/* User Count */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <Users className="h-5 w-5" style={{ color: categoryColor }} />
-                      <span className="font-medium">
-                        {filteredUsers.length} {filteredUsers.length === 1 ? 'person' : 'people'} available now
-                      </span>
-                    </div>
-
-                    {/* User Cards Grid */}
-                    {filteredUsers.length > 0 ? (
-                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredUsers.map(presenceUser => {
-                          const categoryActivities = (presenceUser.activities || []).filter(
-                            (a) => getCategoryForActivity(a) === activeCategory
-                          );
-                          const displayActivities = presenceUser.vibingMode
-                            ? []
-                            : categoryActivities.length > 0
-                            ? categoryActivities
-                            : presenceUser.activities || [];
-
-                          return (
-                            <Card
-                              key={presenceUser.user_id}
-                              className="p-4 bg-gradient-to-br from-white to-purple-50 border-2 hover:scale-[1.02] transition-all hover:shadow-xl"
-                              style={{
-                                borderColor: categoryColor,
-                                boxShadow: `0 4px 20px ${categoryColor}20`,
-                              }}
-                            >
-                              <div className="flex items-start gap-4">
-                                <div className="relative">
-                                  <Avatar className="w-16 h-16 border-2" style={{ borderColor: categoryColor }}>
-                                    <AvatarFallback className="text-3xl" style={{ backgroundColor: categoryColor + '20' }}>
-                                      {presenceUser.avatar || '👤'}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-card" />
-                                </div>
-
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="truncate">{presenceUser.username}</h3>
-                                    {presenceUser.genderSymbol && (
-                                      <span
-                                        className="text-lg flex-shrink-0"
-                                        style={{
-                                          color: presenceUser.genderSymbol === '♂' ? '#3B82F6'
-                                            : presenceUser.genderSymbol === '♀' ? '#EC4899'
-                                            : categoryColor,
-                                        }}
-                                      >
-                                        {presenceUser.genderSymbol}
-                                      </span>
-                                    )}
-                                    <Shield className="h-4 w-4 text-[#990000] flex-shrink-0" />
-                                  </div>
-
-                                  <div className="mb-2">
-                                    <div className="flex flex-wrap gap-1 items-center">
-                                      {presenceUser.vibingMode ? (
-                                        <span className="flex items-center gap-1.5">
-                                          <span className="text-sm font-medium" style={{ color: categoryColor }}>
-                                            🎵 Vibing
-                                          </span>
-                                          <span className="text-xs text-muted-foreground italic">
-                                            (looking for something to do)
-                                          </span>
-                                        </span>
-                                      ) : (
-                                        displayActivities.slice(0, 2).map((activity, i) => (
-                                          <span key={i}>
-                                            <span className="font-medium text-sm" style={{ color: categoryColor }}>
-                                              {activity}
-                                            </span>
-                                            {i < Math.min(displayActivities.length - 1, 1) && (
-                                              <span className="text-muted-foreground mx-1">•</span>
-                                            )}
-                                          </span>
-                                        ))
-                                      )}
-                                      {!presenceUser.vibingMode && displayActivities.length > 2 && (
-                                        <Badge variant="secondary" className="text-xs">
-                                          +{displayActivities.length - 2}
-                                        </Badge>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  {presenceUser.statusMessage && (
-                                    <p className="text-sm text-muted-foreground mb-3 italic line-clamp-2">
-                                      "{presenceUser.statusMessage}"
-                                    </p>
-                                  )}
-
-                                  <Button
-                                    onClick={async () => {
-                                      const { data: { user: authUser } } = await supabase.auth.getUser();
-                                      if (!authUser) return;
-
-                                      // Check if request already exists
-                                      const { data: existing } = await supabase
-                                        .from('match_requests')
-                                        .select('id, status')
-                                        .eq('sender_id', authUser.id)
-                                        .eq('receiver_id', presenceUser.user_id)
-                                        .maybeSingle();
-
-                                      if (existing) {
-                                        if (existing.status === 'pending') {
-                                          toast.info('Request already sent!');
-                                        } else if (existing.status === 'accepted') {
-                                          toast.success('You are already connected!');
-                                        }
-                                        setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
-                                        return;
-                                      }
-
-                                      const { error } = await supabase
-                                        .from('match_requests')
-                                        .insert({
-                                          sender_id: authUser.id,
-                                          receiver_id: presenceUser.user_id,
-                                          activity: presenceUser.activities?.[0] || activeCategory,
-                                          status: 'pending',
-                                          sender_email: authUser.email
-                                        });
-                                      if (error) {
-                                        toast.error('Error: ' + error.message);
-                                      } else {
-                                        setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
-                                        toast.success('Request sent! ✓');
-                                      }
-                                    }}
-                                    size="sm"
-                                    variant="outline"
-                                    className="w-full"
-                                    style={
-                                      acceptedConnections.has(presenceUser.user_id)
-                                        ? {}
-                                        : { borderColor: categoryColor, color: categoryColor }
-                                    }
-                                    disabled={sentRequests.has(presenceUser.user_id) || acceptedConnections.has(presenceUser.user_id)}
-                                  >
-                                    <MessageCircle className="h-4 w-4 mr-1" />
-                                    {acceptedConnections.has(presenceUser.user_id)
-                                      ? 'Already Connected'
-                                      : sentRequests.has(presenceUser.user_id)
-                                      ? 'Request Sent ✓'
-                                      : 'Connect'}
-                                  </Button>
-                                </div>
-                              </div>
-                            </Card>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="text-center py-12 bg-card rounded-lg border border-border">
-                        <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                        <h3 className="mb-2">No one available right now</h3>
-                        <p className="text-muted-foreground">
-                          Check back soon or try a different activity
-                        </p>
-                      </div>
-                    )}
-                  </TabsContent>
-                );
-              })}
-
-              {/* Vibing Tab Content */}
-              <TabsContent value="vibing" className="mt-0">
-                <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200">
-                  <p className="text-sm text-purple-700 font-medium">
-                    🎯 Everyone who's online right now — browse freely without activity filters
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 mb-4">
-                  <Users className="h-5 w-5 text-purple-500" />
-                  <span className="font-medium">
-                    {filteredUsers.length} {filteredUsers.length === 1 ? 'person' : 'people'} online now
-                  </span>
-                </div>
-
-                {filteredUsers.length > 0 ? (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredUsers.map(presenceUser => (
-                      <Card
-                        key={presenceUser.user_id}
-                        className="p-4 bg-gradient-to-br from-white to-purple-50 border-2 hover:scale-[1.02] transition-all hover:shadow-xl"
-                        style={{ borderColor: '#9333EA', boxShadow: '0 4px 20px #9333EA20' }}
-                      >
-                        <div className="flex items-start gap-4">
-                          <div className="relative">
-                            <Avatar className="w-16 h-16 border-2" style={{ borderColor: '#9333EA' }}>
-                              <AvatarFallback className="text-3xl" style={{ backgroundColor: '#9333EA20' }}>
-                                {presenceUser.avatar || '👤'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-card" />
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="truncate">{presenceUser.username}</h3>
-                              {presenceUser.genderSymbol && (
-                                <span className="text-lg flex-shrink-0">{presenceUser.genderSymbol}</span>
-                              )}
-                            </div>
-
-                            {presenceUser.vibingMode ? (
-                              <p className="text-sm font-medium text-purple-500 mb-2">🎵 Vibing</p>
-                            ) : (
-                              <div className="flex flex-wrap gap-1 mb-2">
-                                {(presenceUser.activities || []).slice(0, 3).map(a => (
-                                  <span key={a} className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-medium">{a}</span>
-                                ))}
-                              </div>
-                            )}
-
-                            {presenceUser.statusMessage && (
-                              <p className="text-sm text-muted-foreground mb-3 italic line-clamp-2">
-                                "{presenceUser.statusMessage}"
-                              </p>
-                            )}
-
-                            <Button
-                              onClick={async () => {
-                                if (!user) { handleUnauthenticatedAction(); return; }
-                                const { data: { user: authUser } } = await supabase.auth.getUser();
-                                if (!authUser) return;
-                                const { data: existing } = await supabase
-                                  .from('match_requests')
-                                  .select('id, status')
-                                  .eq('sender_id', authUser.id)
-                                  .eq('receiver_id', presenceUser.user_id)
-                                  .maybeSingle();
-                                if (existing) {
-                                  setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
-                                  return;
-                                }
-                                const { error } = await supabase
-                                  .from('match_requests')
-                                  .insert({
-                                    sender_id: authUser.id,
-                                    receiver_id: presenceUser.user_id,
-                                    activity: presenceUser.activities?.[0] || 'General',
-                                    status: 'pending',
-                                    sender_email: authUser.email,
-                                  });
-                                if (error) {
-                                  toast.error('Error: ' + error.message);
-                                } else {
-                                  setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
-                                  toast.success('Request sent! ✓');
-                                }
-                              }}
-                              size="sm"
-                              variant="outline"
-                              className="w-full"
-                              style={
-                                acceptedConnections.has(presenceUser.user_id)
-                                  ? {}
-                                  : { borderColor: '#9333EA', color: '#9333EA' }
-                              }
-                              disabled={sentRequests.has(presenceUser.user_id) || acceptedConnections.has(presenceUser.user_id)}
-                            >
-                              <MessageCircle className="h-4 w-4 mr-1" />
-                              {acceptedConnections.has(presenceUser.user_id)
-                                ? 'Already Connected'
-                                : sentRequests.has(presenceUser.user_id)
-                                ? 'Request Sent ✓'
-                                : 'Connect'}
-                            </Button>
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 bg-card rounded-lg border border-border">
-                    <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="mb-2">No one online right now</h3>
-                    <p className="text-muted-foreground">Check back soon!</p>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-
-            {/* Explore Button */}
             <div className="mt-8 text-center">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => navigate('/discovery')}
-              >
+              <Button variant="outline" size="lg" onClick={() => navigate('/discovery')}>
                 Explore Other Activities
               </Button>
             </div>
