@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Navbar } from '../components/Navbar';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -35,9 +35,49 @@ const ACTIVITY_IMAGES: Record<string, string> = {
   'Social Mixers': 'https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=400',
   'Trivia / Karaoke': 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400',
   'Watch Parties': 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400',
+  // Gaming — FPS / Tactical Shooters
+  'Valorant': 'https://media.rawg.io/media/games/b11/b11127b9ee3c3701bd15b9af3286d20e.jpg',
+  'Apex Legends': 'https://media.rawg.io/media/games/737/737ea5662211d2e0bbd6f5989189e4f1.jpg',
+  'Overwatch 2': 'https://media.rawg.io/media/games/95a/95a10817d1fc648cff1153f3fa8ef6c5.jpg',
+  'Call of Duty: Warzone': 'https://media.rawg.io/media/games/7e3/7e327a055bedb9b6d1be86593bef473d.jpg',
+  'Counter-Strike 2': 'https://media.rawg.io/media/games/ec4/ec4b02bdb3eb5c6212992c19bc05697e.jpg',
+  'Rainbow Six Siege': 'https://media.rawg.io/media/games/b34/b3419c2706f8f8dbe40d08e23642ad06.jpg',
+  'The Finals': 'https://media.rawg.io/media/games/fa2/fa28280bb6f7bec50b94bc821d412795.jpg',
+  // Gaming — MOBA / Strategy
+  'League of Legends': 'https://media.rawg.io/media/games/78b/78bc81e247fc7e77af700cbd632a9297.jpg',
+  'Dota 2': 'https://media.rawg.io/media/games/6fc/6fcf4cd3b17c288821388e6085bb0fc9.jpg',
+  'Smite': 'https://media.rawg.io/media/games/cc7/cc77035eb972f179f5090ee2a0fabd99.jpg',
+  // Gaming — Auto Battler / Strategy Casual
+  'Teamfight Tactics': 'https://media.rawg.io/media/games/f4f/f4fe38e8fc3948fe5c682554dee39248.jpg',
+  'Hearthstone Battlegrounds': 'https://media.rawg.io/media/games/1db/1dbc3d0c9de2709e21326cdcb91468ae.jpg',
+  'Auto Chess': 'https://media.rawg.io/media/games/86c/86c4cfd81576dba6f0d2ee2d7a8dd97f.jpg',
+  // Gaming — Co-Op Survival / Sandbox
+  'Minecraft': 'https://media.rawg.io/media/games/b4e/b4e4c73d5aa4ec66bbf75375c4847a2b.jpg',
+  'Valheim': 'https://media.rawg.io/media/games/adb/adb59be81367b19c2544457424bcf086.jpg',
+  'ARK: Survival Ascended': 'https://media.rawg.io/media/screenshots/c12/c122154db00ae6e3701c1520aec516f6.jpg',
+  'Sons of the Forest': 'https://media.rawg.io/media/games/7a0/7a092fa63811a7f6ed90f456a8887e91.jpg',
+  'Palworld': 'https://media.rawg.io/media/games/4e9/4e9c951414c732923fa72d5b1da49402.jpg',
+  // Gaming — Party / Social Casual Multiplayer
+  'Jackbox Party Packs': 'https://media.rawg.io/media/games/137/137544a823a3b16a226878a9e5506c0c.jpg',
+  'Among Us': 'https://media.rawg.io/media/games/e74/e74458058b35e01c1ae3feeb39a3f724.jpg',
+  'Fall Guys': 'https://media.rawg.io/media/games/5eb/5eb49eb2fa0738fdb5bacea557b1bc57.jpg',
+  'Party Animals': 'https://media.rawg.io/media/games/b66/b6601abafd9fa58ff7453808ca3581c2.jpg',
+  'Goose Goose Duck': 'https://media.rawg.io/media/screenshots/983/98330a21cccd92d900d7b97b81e6db9e.jpg',
+  // Gaming — Sports / Simulation Multiplayer
+  'EA Sports FC (FIFA)': 'https://media.rawg.io/media/games/104/10404407d458d90f4559a1f587c2650a.jpg',
+  'NBA 2K': 'https://media.rawg.io/media/games/92c/92ce114f47867d4e6538df92bb9f5097.jpg',
+  'Rocket League': 'https://media.rawg.io/media/games/8cc/8cce7c0e99dcc43d66c8efd42f9d03e3.jpg',
+  'Madden NFL': 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400',
+  // Gaming — MMO / Persistent World
+  'World of Warcraft': 'https://media.rawg.io/media/games/0d9/0d930ea604ee240c5af30c58f73ddf48.jpg',
+  'Final Fantasy XIV': 'https://media.rawg.io/media/screenshots/8f7/8f73b974f60a58362532440e9183188c.jpg',
+  'Elder Scrolls Online': 'https://media.rawg.io/media/games/8fd/8fdc7843cffc863950cf5f859ea73aa4.jpg',
+  'Destiny 2': 'https://media.rawg.io/media/games/34b/34b1f1850a1c06fd971bc6ab3ac0ce0e.jpg',
+  // Gaming — Extraction / Tactical Survival
+  'Escape from Tarkov': 'https://media.rawg.io/media/games/a9a/a9ab53644b92698b18957a362c99b4e2.jpg',
+  'Dark and Darker': 'https://media.rawg.io/media/screenshots/e72/e722d462113f4e595426e92c322b5012.jpg',
+  'Hunt: Showdown': 'https://media.rawg.io/media/games/929/929a78693f607a3332ecb89fe7ffaf06.jpg',
 };
-
-const RAWG_KEY = '17f35928eb18435aae190850af8c6ad1';
 
 type Category = keyof typeof ACTIVITIES;
 
@@ -45,30 +85,8 @@ export function Discovery() {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
-  const [gameImages, setGameImages] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    const gamingActivities = getActivitiesInCategory('gaming');
-    Promise.all(
-      gamingActivities.map(async (game) => {
-        try {
-          const res = await fetch(
-            `https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(game)}&page_size=1`
-          );
-          const data = await res.json();
-          const img: string | undefined = data.results?.[0]?.background_image;
-          return [game, img ?? ''] as [string, string];
-        } catch {
-          return [game, ''] as [string, string];
-        }
-      })
-    ).then(entries => {
-      setGameImages(Object.fromEntries(entries.filter(([, img]) => img)));
-    });
-  }, []);
-
-  const getActivityImage = (activity: string) =>
-    ACTIVITY_IMAGES[activity] || gameImages[activity] || '';
+  const getActivityImage = (activity: string) => ACTIVITY_IMAGES[activity] || '';
 
   const categories: { key: Category; name: string }[] = [
     { key: 'gaming', name: 'Gaming' },
