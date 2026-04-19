@@ -15,8 +15,10 @@ export function LoginPage() {
 
   // Auto-redirect logged-in users to activity hub
   useEffect(() => {
+    let cancelled = false;
     const checkSessionAndProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled) return;
       if (session) {
         const profileQuery = supabase
           .from('profiles')
@@ -25,15 +27,13 @@ export function LoginPage() {
           .single();
         const profileTimeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 3000));
         const result = await Promise.race([profileQuery, profileTimeout]);
+        if (cancelled) return;
         const profile = result && 'data' in result ? result.data : null;
-        if (!profile) {
-          await supabase.auth.signOut();
-          return;
-        }
         navigate(profile && !profile.display_name && !profile.avatar ? '/profile-setup' : '/activity-hub', { replace: true });
       }
     };
     checkSessionAndProfile();
+    return () => { cancelled = true; };
   }, [navigate]);
 
   const [mode, setMode] = useState<'login' | 'signup'>('login');
