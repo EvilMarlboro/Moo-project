@@ -26,6 +26,10 @@ export function LoginPage() {
         const profileTimeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 3000));
         const result = await Promise.race([profileQuery, profileTimeout]);
         const profile = result && 'data' in result ? result.data : null;
+        if (!profile) {
+          await supabase.auth.signOut();
+          return;
+        }
         navigate(profile && !profile.display_name && !profile.avatar ? '/profile-setup' : '/activity-hub', { replace: true });
       }
     };
@@ -77,6 +81,7 @@ export function LoginPage() {
     }, 10000);
 
     try {
+      await supabase.auth.signOut();
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,

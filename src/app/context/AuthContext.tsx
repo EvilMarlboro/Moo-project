@@ -36,6 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isRefreshingRef = useRef(false);
 
   const refreshSession = async () => {
+    console.log('refreshSession: start');
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error('Error refreshing session:', err);
     } finally {
+      console.log('refreshSession: complete', user);
       setLoading(false);
     }
   };
