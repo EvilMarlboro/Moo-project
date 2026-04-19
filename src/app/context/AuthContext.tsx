@@ -36,11 +36,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isRefreshingRef = useRef(false);
 
   const refreshSession = async () => {
+    console.log('[refreshSession] start');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log('[refreshSession] getSession complete — session:', session ? `exists (uid: ${session.user.id})` : 'null', '| error:', sessionError);
+
       if (session?.user) {
         setSupabaseUserId(session.user.id);
 
+        console.log('[refreshSession] starting profiles query for uid:', session.user.id);
         const profileQuery = supabase
           .from('profiles')
           .select('*')
@@ -48,10 +52,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .single();
         const profileTimeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 5000));
         const result = await Promise.race([profileQuery, profileTimeout]);
+        console.log('[refreshSession] profiles race resolved — result:', result);
+
         const profile = result && 'data' in result ? result.data : null;
+        const timedOut = result === null;
+        console.log('[refreshSession] profile:', profile, '| timed out:', timedOut);
 
         if (profile && profile.display_name) {
-          setUser({
+          const userObj = {
             id: session.user.id,
             username: profile.display_name,
             email: session.user.email || '',
@@ -61,24 +69,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             activityProfiles: profile.activity_profiles || {},
             statusMessage: profile.status_message || '',
             vibingMode: profile.vibing_mode || false,
-          });
+          };
+          console.log('[refreshSession] setting full user:', userObj);
+          setUser(userObj);
         } else {
-          setUser({
+          const fallbackUser = {
             id: session.user.id,
             username: '',
             email: session.user.email || '',
             avatar: '👤',
             enabledActivities: [],
             activityProfiles: {},
-          });
+          };
+          console.log('[refreshSession] setting fallback user (no profile / timeout):', fallbackUser);
+          setUser(fallbackUser);
         }
       } else {
+        console.log('[refreshSession] no session — clearing user');
         setSupabaseUserId(null);
         setUser(null);
       }
     } catch (err) {
-      console.error('Error refreshing session:', err);
+      console.error('[refreshSession] caught error:', err);
     } finally {
+      console.log('[refreshSession] complete — setLoading(false)');
       setLoading(false);
     }
   };
