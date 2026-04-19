@@ -7,7 +7,7 @@ import { Label } from '../components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { User, Activity, Edit, Trash2, Plus, CheckCircle, X, LogOut, Upload, ImageIcon, BarChart2, Heart, Eye, Palette } from 'lucide-react';
+import { User, Activity, Edit, Trash2, Plus, CheckCircle, X, LogOut, Upload, ImageIcon, BarChart2, Heart, Eye, Palette, Star, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
 import { AVATAR_OPTIONS } from '../data/avatarImages';
@@ -32,6 +32,7 @@ export function Settings() {
   const [totalWeekMatches, setTotalWeekMatches] = useState(0);
   const [profileViewCount, setProfileViewCount] = useState<number | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [userReviews, setUserReviews] = useState<any[]>([]);
 
   useEffect(() => {
     if (user === undefined) return;
@@ -70,7 +71,7 @@ export function Settings() {
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
 
-      const [matchResult, viewResult] = await Promise.all([
+      const [matchResult, viewResult, reviewsResult] = await Promise.all([
         supabase
           .from('match_requests')
           .select('created_at')
@@ -81,7 +82,25 @@ export function Settings() {
           .from('profile_views')
           .select('id', { count: 'exact', head: true })
           .eq('viewed_id', supabaseUserId),
+        supabase
+          .from('reviews')
+          .select('reviewer_id, rating, comment, created_at')
+          .eq('reviewed_id', supabaseUserId)
+          .order('created_at', { ascending: false }),
       ]);
+
+      const reviewsData = reviewsResult.data || [];
+      if (reviewsData.length > 0) {
+        const reviewerIds = [...new Set(reviewsData.map((r: any) => r.reviewer_id))];
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, display_name, avatar')
+          .in('id', reviewerIds);
+        const profileMap = Object.fromEntries((profilesData || []).map((p: any) => [p.id, p]));
+        setUserReviews(reviewsData.map((r: any) => ({ ...r, reviewer: profileMap[r.reviewer_id] || null })));
+      } else {
+        setUserReviews([]);
+      }
 
       // Build 7-day graph data
       const days = Array.from({ length: 7 }, (_, i) => {
@@ -716,6 +735,83 @@ export function Settings() {
                         />
                       </LineChart>
                     </ResponsiveContainer>
+                  </Card>
+
+                  {/* Reviews */}
+                  <Card className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Star className="h-5 w-5 text-yellow-500" />
+                      <h3>Your Reviews</h3>
+                    </div>
+
+                    {userReviews.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <MessageSquare className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                        <p className="text-sm">No reviews yet</p>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Summary */}
+                        <div className="flex items-center gap-4 mb-5 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                          <div className="text-center">
+                            <p className="text-3xl font-bold text-yellow-600">
+                              {(userReviews.reduce((s, r) => s + r.rating, 0) / userReviews.length).toFixed(1)}
+                            </p>
+                            <div className="flex gap-0.5 justify-center mt-1">
+                              {[1,2,3,4,5].map(i => {
+                                const avg = userReviews.reduce((s, r) => s + r.rating, 0) / userReviews.length;
+                                return (
+                                  <Star
+                                    key={i}
+                                    className="h-4 w-4"
+                                    fill={i <= Math.round(avg) ? '#EAB308' : 'none'}
+                                    stroke={i <= Math.round(avg) ? '#EAB308' : '#D1D5DB'}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                          <div className="border-l border-yellow-200 pl-4">
+                            <p className="text-2xl font-bold text-yellow-700">{userReviews.length}</p>
+                            <p className="text-xs text-muted-foreground">{userReviews.length === 1 ? 'review' : 'reviews'} total</p>
+                          </div>
+                        </div>
+
+                        {/* Review list */}
+                        <div className="space-y-3">
+                          {userReviews.map((review, idx) => (
+                            <div key={idx} className="p-4 rounded-xl border border-border bg-secondary/20">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <div className="w-8 h-8 rounded-full bg-purple-100 border border-purple-200 flex items-center justify-center text-base flex-shrink-0">
+                                    {review.reviewer?.avatar || '👤'}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-medium truncate">{review.reviewer?.display_name || 'USC Student'}</p>
+                                    <div className="flex gap-0.5">
+                                      {[1,2,3,4,5].map(i => (
+                                        <Star
+                                          key={i}
+                                          className="h-3 w-3"
+                                          fill={i <= review.rating ? '#EAB308' : 'none'}
+                                          stroke={i <= review.rating ? '#EAB308' : '#D1D5DB'}
+                                        />
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                                <p className="text-xs text-muted-foreground flex-shrink-0">
+                                  {new Date(review.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                </p>
+                              </div>
+                              {review.comment && (
+                                <p className="text-sm text-muted-foreground italic mt-2 pl-10">"{review.comment}"</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </Card>
                 </>
               )}

@@ -379,6 +379,14 @@ export function ActivityHub() {
       setExistingReviews(prev => ({ ...prev, [chatId]: { rating, comment } }));
       setPendingRatings(prev => { const n = { ...prev }; delete n[chatId]; return n; });
       setPendingComments(prev => { const n = { ...prev }; delete n[chatId]; return n; });
+      if (user) {
+        await supabase.from('notifications').insert({
+          user_id: partnerId,
+          type: 'new_review',
+          message: `${user.username} left you a review`,
+          data: { reviewer_id: supabaseUserId, rating, chat_id: chatId },
+        });
+      }
     }
 
     setSubmittingReview(prev => { const n = new Set(prev); n.delete(chatId); return n; });
