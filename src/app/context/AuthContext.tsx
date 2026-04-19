@@ -98,24 +98,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    refreshSession();
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        setSupabaseUserId(session.user.id);
-        if (!isRefreshingRef.current) {
-          isRefreshingRef.current = true;
-          try {
-            await refreshSession();
-          } finally {
-            isRefreshingRef.current = false;
+      console.log('[onAuthStateChange] event:', event, '| session:', session ? `exists (uid: ${session.user.id})` : 'null');
+
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+        if (session?.user) {
+          if (!isRefreshingRef.current) {
+            isRefreshingRef.current = true;
+            try {
+              await refreshSession();
+            } finally {
+              isRefreshingRef.current = false;
+            }
           }
+        } else if (event === 'INITIAL_SESSION') {
+          // No session on initial load — user is logged out
+          setSupabaseUserId(null);
+          setUser(null);
+          setLoading(false);
         }
       } else if (event === 'SIGNED_OUT') {
         setSupabaseUserId(null);
         setUser(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
