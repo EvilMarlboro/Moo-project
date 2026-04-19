@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const isRefreshingRef = useRef(false);
+  const signOutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const refreshSession = async () => {
     console.log('[refreshSession] start');
@@ -102,6 +103,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('[onAuthStateChange] event:', event, '| session:', session ? `exists (uid: ${session.user.id})` : 'null');
 
       if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+        // Cancel any pending sign-out clear (token refresh fires SIGNED_OUT then SIGNED_IN)
+        if (signOutTimerRef.current) {
+          clearTimeout(signOutTimerRef.current);
+          signOutTimerRef.current = null;
+        }
         if (session?.user) {
           if (!isRefreshingRef.current) {
             isRefreshingRef.current = true;
@@ -118,13 +124,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false);
         }
       } else if (event === 'SIGNED_OUT') {
-        setSupabaseUserId(null);
-        setUser(null);
-        setLoading(false);
+        // Delay clearing state — Supabase fires SIGNED_OUT during token refresh
+        // before immediately firing SIGNED_IN. Cancel if SIGNED_IN arrives first.
+        signOutTimerRef.current = setTimeout(() => {
+          signOutTimerRef.current = null;
+          setSupabaseUserId(null);
+          setUser(null);
+          setLoading(false);
+        }, 500);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      if (signOutTimerRef.current) clearTimeout(signOutTimerRef.current);
+    };
   }, []);
 
   const login = (userData: User) => {
