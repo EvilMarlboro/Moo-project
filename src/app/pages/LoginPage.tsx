@@ -26,7 +26,7 @@ export function LoginPage() {
         const profileTimeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 3000));
         const result = await Promise.race([profileQuery, profileTimeout]);
         const profile = result && 'data' in result ? result.data : null;
-        navigate(profile?.display_name && profile?.avatar ? '/activity-hub' : '/profile-setup', { replace: true });
+        navigate(profile && !profile.display_name && !profile.avatar ? '/profile-setup' : '/activity-hub', { replace: true });
       }
     };
     checkSessionAndProfile();
