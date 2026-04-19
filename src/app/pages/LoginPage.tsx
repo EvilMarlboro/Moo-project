@@ -11,21 +11,14 @@ import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { refreshSession } = useAuth();
+  const { user, refreshSession } = useAuth();
 
-  // Auto-redirect logged-in users to activity hub
+  // Navigate away as soon as AuthContext confirms the user is logged in
   useEffect(() => {
-    let cancelled = false;
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (cancelled) return;
-      if (session) {
-        navigate('/activity-hub', { replace: true });
-      }
-    };
-    checkSession();
-    return () => { cancelled = true; };
-  }, [navigate]);
+    if (user) {
+      navigate('/activity-hub', { replace: true });
+    }
+  }, [user, navigate]);
 
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
@@ -79,7 +72,7 @@ export function LoginPage() {
         return;
       }
 
-      navigate('/activity-hub', { replace: true });
+      // Navigation handled by useEffect watching user state
     } catch (err) {
       setError('Sign in failed. Please try again.');
     } finally {
