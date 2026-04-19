@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
+import { UserAvatar } from '../components/UserAvatar';
 import { Send, ArrowLeft, Flag, AlertCircle, Shield, Gamepad2, UserX, MoreVertical } from 'lucide-react';
 import { CATEGORY_COLORS } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
@@ -391,9 +392,12 @@ export function Chat() {
 
                 return (
                   <div key={message.id} className={`flex gap-3 ${isOwnMessage ? 'flex-row-reverse' : ''}`}>
-                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-lg flex-shrink-0">
-                      {senderAvatar}
-                    </div>
+                    <UserAvatar
+                      avatar={senderAvatar}
+                      username={senderName}
+                      className="w-8 h-8 flex-shrink-0"
+                      fallbackClassName="text-base"
+                    />
                     <div className={`flex-1 ${isOwnMessage ? 'text-right' : ''}`}>
                       <div className="flex items-baseline gap-2 mb-1">
                         <span className={`text-sm font-medium ${isOwnMessage ? 'order-2' : ''}`}>

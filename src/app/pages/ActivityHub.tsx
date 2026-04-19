@@ -14,6 +14,7 @@ import { getCategoryForActivity, getRequiredFieldsForActivity } from '../data/ac
 import { useMatches } from '../context/MatchContext';
 import { Card } from '../components/ui/card';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
+import { UserAvatar } from '../components/UserAvatar';
 import { supabase } from '../lib/supabase';
 import { publicAnonKey } from '/utils/supabase/info';
 import { toast } from 'sonner';
@@ -464,11 +465,12 @@ export function ActivityHub() {
               <DialogHeader>
                 <div className="flex items-center gap-4 mb-2">
                   <div className="relative">
-                    <Avatar className="w-20 h-20 border-2 border-purple-300">
-                      <AvatarFallback className="text-4xl bg-purple-50">
-                        {selectedUser.avatar || '👤'}
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar
+                      avatar={selectedUser.avatar || '👤'}
+                      username={selectedUser.username}
+                      className="w-20 h-20 border-2 border-purple-300"
+                      fallbackClassName="text-4xl bg-purple-50"
+                    />
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white" />
                   </div>
                   <div>
@@ -606,11 +608,13 @@ export function ActivityHub() {
                     return (
                       <Card key={request.id} className="p-3 bg-secondary/30 border-2" style={{ borderColor: categoryColor }}>
                         <div className="flex items-start gap-3 mb-2">
-                          <Avatar className="w-12 h-12 border-2" style={{ borderColor: categoryColor }}>
-                            <AvatarFallback className="text-2xl" style={{ backgroundColor: categoryColor + '20' }}>
-                              {request.avatar}
-                            </AvatarFallback>
-                          </Avatar>
+                          <UserAvatar
+                            avatar={request.avatar}
+                            username={request.username}
+                            className="w-12 h-12 border-2"
+                            fallbackClassName="text-2xl"
+                            fallbackStyle={{ backgroundColor: categoryColor + '20', borderColor: categoryColor }}
+                          />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 mb-0.5">
                               <h4 className="text-sm font-medium truncate">{request.username}</h4>
@@ -674,11 +678,13 @@ export function ActivityHub() {
                     return (
                       <Card key={chat.id} className="p-3 bg-secondary/30 border-2 cursor-pointer hover:bg-secondary/50 transition-colors" style={{ borderColor: categoryColor }} onClick={() => navigate(`/chat/${chat.id}`)}>
                         <div className="flex items-center gap-3">
-                          <Avatar className="w-10 h-10 border-2" style={{ borderColor: categoryColor }}>
-                            <AvatarFallback className="text-xl" style={{ backgroundColor: categoryColor + '20' }}>
-                              {chat.partner_avatar}
-                            </AvatarFallback>
-                          </Avatar>
+                          <UserAvatar
+                            avatar={chat.partner_avatar}
+                            username={chat.partner_username}
+                            className="w-10 h-10 border-2"
+                            fallbackClassName="text-xl"
+                            fallbackStyle={{ backgroundColor: categoryColor + '20' }}
+                          />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 mb-0.5">
                               <h4 className="text-sm font-medium truncate">{chat.partner_username}</h4>
@@ -760,11 +766,13 @@ export function ActivityHub() {
                     >
                       <div className="flex items-start gap-3">
                         <div className="relative flex-shrink-0">
-                          <Avatar className="w-14 h-14 border-2" style={{ borderColor: cardColor }}>
-                            <AvatarFallback className="text-2xl" style={{ backgroundColor: cardColor + '20' }}>
-                              {presenceUser.avatar || '👤'}
-                            </AvatarFallback>
-                          </Avatar>
+                          <UserAvatar
+                            avatar={presenceUser.avatar || '👤'}
+                            username={presenceUser.username}
+                            className="w-14 h-14 border-2"
+                            fallbackClassName="text-2xl"
+                            fallbackStyle={{ backgroundColor: cardColor + '20', borderColor: cardColor }}
+                          />
                           <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card" />
                         </div>
 

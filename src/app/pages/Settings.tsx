@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Navbar } from '../components/Navbar';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
@@ -6,18 +6,23 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
-import { Avatar, AvatarFallback } from '../components/ui/avatar';
-import { User, Activity, Edit, Trash2, Plus, CheckCircle, X, LogOut } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { User, Activity, Edit, Trash2, Plus, CheckCircle, X, LogOut, Upload, ImageIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
 import { AVATAR_OPTIONS } from '../data/avatarImages';
 import { ACTIVITIES, CATEGORY_COLORS } from '../data/mockData';
 import { getCategoryForActivity, getColorForActivity, isActivityProfileComplete, getActivitiesInCategory } from '../data/activityHelpers';
+import { supabase } from '../lib/supabase';
+import { toast } from 'sonner';
+
+const isUrl = (s: string) => s.startsWith('http://') || s.startsWith('https://') || s.startsWith('blob:');
 
 export function Settings() {
   const { user, loading, updateUser, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user === undefined) return;
@@ -30,6 +35,14 @@ export function Settings() {
   const [editedAvatar, setEditedAvatar] = useState(
     AVATAR_OPTIONS.find(a => a.emoji === user?.avatar)?.id || 'avatar1'
   );
+  const [avatarMode, setAvatarMode] = useState<'emoji' | 'photo'>(
+    user?.avatar && isUrl(user.avatar) ? 'photo' : 'emoji'
+  );
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>(
+    user?.avatar && isUrl(user.avatar) ? user.avatar : ''
+  );
+  const [savingPhoto, setSavingPhoto] = useState(false);
 
   // Activity management state
   const [showAddActivity, setShowAddActivity] = useState(false);
@@ -53,19 +66,51 @@ export function Settings() {
     }
   };
 
-  const handleSaveProfile = () => {
-    const avatar = AVATAR_OPTIONS.find(a => a.id === editedAvatar);
-    updateUser({
-      username: editedUsername,
-      avatar: avatar?.emoji || user.avatar
-    });
-    setIsEditingProfile(false);
+  const handleSaveProfile = async () => {
+    setSavingPhoto(true);
+    try {
+      let avatarValue = user.avatar;
+
+      if (avatarMode === 'photo' && photoFile) {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) throw new Error('Not authenticated');
+        const ext = photoFile.name.split('.').pop();
+        const path = `${authUser.id}/avatar.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(path, photoFile, { upsert: true });
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
+        avatarValue = urlData.publicUrl;
+      } else if (avatarMode === 'emoji') {
+        const avatar = AVATAR_OPTIONS.find(a => a.id === editedAvatar);
+        avatarValue = avatar?.emoji || user.avatar;
+      }
+
+      updateUser({ username: editedUsername, avatar: avatarValue });
+      setPhotoFile(null);
+      setIsEditingProfile(false);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save profile');
+    } finally {
+      setSavingPhoto(false);
+    }
   };
 
   const handleCancelEdit = () => {
     setEditedUsername(user.username);
     setEditedAvatar(AVATAR_OPTIONS.find(a => a.emoji === user.avatar)?.id || 'avatar1');
+    setAvatarMode(user.avatar && isUrl(user.avatar) ? 'photo' : 'emoji');
+    setPhotoFile(null);
+    setPhotoPreview(user.avatar && isUrl(user.avatar) ? user.avatar : '');
     setIsEditingProfile(false);
+  };
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
   };
 
   const handleRemoveActivity = (activity: string) => {
@@ -146,53 +191,107 @@ export function Settings() {
               </div>
 
               <div className="space-y-6">
-                {/* Avatar Selection */}
+                {/* Avatar Section */}
                 <div>
-                  <Label className="mb-3 block">Avatar</Label>
+                  <Label className="mb-3 block">Profile Picture</Label>
+                  {/* Current avatar preview */}
                   <div className="flex items-center gap-4 mb-4">
                     <Avatar className="h-20 w-20 border-2 border-primary">
-                      <AvatarFallback 
-                        className="text-4xl"
-                        style={{ backgroundColor: currentAvatar?.color + '20' }}
-                      >
-                        {currentAvatar?.emoji}
-                      </AvatarFallback>
+                      {isUrl(user.avatar) ? (
+                        <>
+                          <AvatarImage src={user.avatar} alt={user.username} />
+                          <AvatarFallback className="text-3xl">{user.username?.[0]?.toUpperCase()}</AvatarFallback>
+                        </>
+                      ) : (
+                        <AvatarFallback className="text-4xl" style={{ backgroundColor: currentAvatar?.color + '20' }}>
+                          {user.avatar}
+                        </AvatarFallback>
+                      )}
                     </Avatar>
-                    {isEditingProfile && (
-                      <div className="flex-1">
-                        <p className="text-sm text-muted-foreground">
-                          Choose a new avatar below
-                        </p>
-                      </div>
-                    )}
                   </div>
 
                   {isEditingProfile && (
-                    <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-                      {AVATAR_OPTIONS.map(avatar => (
-                        <button
-                          key={avatar.id}
-                          onClick={() => setEditedAvatar(avatar.id)}
-                          className={`
-                            aspect-square rounded-lg border-2 p-2 transition-all
-                            hover:scale-105 flex flex-col items-center justify-center gap-1
-                            ${editedAvatar === avatar.id 
-                              ? 'border-primary bg-primary/10 shadow-lg' 
-                              : 'border-border bg-secondary/50 hover:border-primary/50'
-                            }
-                          `}
+                    <>
+                      {/* Mode toggle */}
+                      <div className="flex gap-2 mb-4">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={avatarMode === 'emoji' ? 'default' : 'outline'}
+                          onClick={() => setAvatarMode('emoji')}
                         >
-                          <Avatar className="h-10 w-10">
-                            <AvatarFallback 
-                              className="text-xl"
-                              style={{ backgroundColor: avatar.color + '20' }}
+                          😀 Choose Avatar
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={avatarMode === 'photo' ? 'default' : 'outline'}
+                          onClick={() => setAvatarMode('photo')}
+                        >
+                          <Upload className="h-4 w-4 mr-1" />
+                          Upload Photo
+                        </Button>
+                      </div>
+
+                      {avatarMode === 'emoji' && (
+                        <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                          {AVATAR_OPTIONS.map(avatar => (
+                            <button
+                              key={avatar.id}
+                              onClick={() => setEditedAvatar(avatar.id)}
+                              className={`
+                                aspect-square rounded-lg border-2 p-2 transition-all
+                                hover:scale-105 flex flex-col items-center justify-center gap-1
+                                ${editedAvatar === avatar.id
+                                  ? 'border-primary bg-primary/10 shadow-lg'
+                                  : 'border-border bg-secondary/50 hover:border-primary/50'
+                                }
+                              `}
                             >
-                              {avatar.emoji}
-                            </AvatarFallback>
-                          </Avatar>
-                        </button>
-                      ))}
-                    </div>
+                              <Avatar className="h-10 w-10">
+                                <AvatarFallback className="text-xl" style={{ backgroundColor: avatar.color + '20' }}>
+                                  {avatar.emoji}
+                                </AvatarFallback>
+                              </Avatar>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {avatarMode === 'photo' && (
+                        <div>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handlePhotoSelect}
+                          />
+                          {photoPreview ? (
+                            <div className="flex items-center gap-4">
+                              <img src={photoPreview} alt="Preview" className="h-20 w-20 rounded-full object-cover border-2 border-primary" />
+                              <div className="flex gap-2">
+                                <Button type="button" size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                                  Change
+                                </Button>
+                                <Button type="button" size="sm" variant="outline" onClick={() => { setPhotoFile(null); setPhotoPreview(''); }} className="text-destructive">
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => fileInputRef.current?.click()}
+                              className="flex flex-col items-center gap-2 w-full py-8 border-2 border-dashed border-border rounded-xl hover:border-primary/50 transition-colors"
+                            >
+                              <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">Click to upload a photo</span>
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -222,10 +321,10 @@ export function Settings() {
                 {/* Save/Cancel Buttons */}
                 {isEditingProfile && (
                   <div className="flex gap-3 pt-4">
-                    <Button onClick={handleSaveProfile} className="flex-1">
-                      Save Changes
+                    <Button onClick={handleSaveProfile} disabled={savingPhoto} className="flex-1">
+                      {savingPhoto ? 'Saving...' : 'Save Changes'}
                     </Button>
-                    <Button variant="outline" onClick={handleCancelEdit} className="flex-1">
+                    <Button variant="outline" onClick={handleCancelEdit} disabled={savingPhoto} className="flex-1">
                       Cancel
                     </Button>
                   </div>

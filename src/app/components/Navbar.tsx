@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router';
 import { Home, Search, User, Settings, Shield } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '../context/AuthContext';
+import { UserAvatar } from './UserAvatar';
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export function Navbar() {
 
                 {/* User Avatar */}
                 <div className="flex items-center gap-2 ml-2 pl-2 border-l border-border">
-                  <div className="text-2xl">{user.avatar}</div>
+                  <UserAvatar avatar={user.avatar} username={user.username} className="h-9 w-9" fallbackClassName="text-xl" />
                   <div className="hidden md:flex items-center gap-1">
                     <span className="text-sm">{user.username}</span>
                     {user.genderSymbol && (
