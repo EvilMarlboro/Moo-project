@@ -7,7 +7,7 @@ import { Label } from '../components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { User, Activity, Edit, Trash2, Plus, CheckCircle, X, LogOut, Upload, ImageIcon, BarChart2, Heart, Eye } from 'lucide-react';
+import { User, Activity, Edit, Trash2, Plus, CheckCircle, X, LogOut, Upload, ImageIcon, BarChart2, Heart, Eye, Palette } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
 import { AVATAR_OPTIONS } from '../data/avatarImages';
@@ -15,6 +15,8 @@ import { ACTIVITIES, CATEGORY_COLORS } from '../data/mockData';
 import { getCategoryForActivity, getColorForActivity, isActivityProfileComplete, getActivitiesInCategory } from '../data/activityHelpers';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
+import { PROFILE_BACKGROUNDS, BackgroundKey } from '../data/profileBackgrounds';
+import { UserAvatar } from '../components/UserAvatar';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const isUrl = (s: string) => s.startsWith('http://') || s.startsWith('https://') || s.startsWith('blob:');
@@ -50,6 +52,11 @@ export function Settings() {
     user?.avatar && isUrl(user.avatar) ? user.avatar : ''
   );
   const [savingPhoto, setSavingPhoto] = useState(false);
+
+  // Background customization state
+  const [selectedBackground, setSelectedBackground] = useState<BackgroundKey>(
+    (user?.profileBackground as BackgroundKey) || 'default'
+  );
 
   // Activity management state
   const [showAddActivity, setShowAddActivity] = useState(false);
@@ -150,6 +157,12 @@ export function Settings() {
     setPhotoFile(null);
     setPhotoPreview(user.avatar && isUrl(user.avatar) ? user.avatar : '');
     setIsEditingProfile(false);
+  };
+
+  const handleSelectBackground = (key: BackgroundKey) => {
+    setSelectedBackground(key);
+    updateUser({ profileBackground: key });
+    toast.success(`Background set to ${PROFILE_BACKGROUNDS[key].label}`);
   };
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -385,6 +398,84 @@ export function Settings() {
                     </Button>
                   </div>
                 )}
+              </div>
+            </Card>
+
+            {/* Profile Card Background */}
+            <Card className="p-6 mt-4">
+              <div className="flex items-center gap-2 mb-5">
+                <Palette className="h-5 w-5 text-purple-500" />
+                <h3>Profile Card Background</h3>
+              </div>
+
+              <div className="flex gap-6 items-start">
+                {/* Swatches grid */}
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground mb-3">Choose a background for your profile card</p>
+                  <div className="grid grid-cols-5 gap-2">
+                    {(Object.keys(PROFILE_BACKGROUNDS) as BackgroundKey[]).map(key => {
+                      const bg = PROFILE_BACKGROUNDS[key];
+                      const isSelected = selectedBackground === key;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => handleSelectBackground(key)}
+                          className={`relative aspect-square rounded-xl border-2 transition-all hover:scale-105 overflow-hidden ${isSelected ? 'border-primary shadow-lg scale-105' : 'border-border'}`}
+                          title={bg.label}
+                        >
+                          <div
+                            className="absolute inset-0"
+                            style={key === 'default' ? { backgroundColor: 'hsl(var(--card))' } : bg.style}
+                          />
+                          {isSelected && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-5 h-5 rounded-full bg-white/90 flex items-center justify-center shadow">
+                                <CheckCircle className="h-3.5 w-3.5 text-primary" />
+                              </div>
+                            </div>
+                          )}
+                          <span className="absolute bottom-1 left-0 right-0 text-center text-[9px] font-medium drop-shadow"
+                            style={{ color: key === 'default' ? 'hsl(var(--foreground))' : 'white' }}>
+                            {bg.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Live preview */}
+                <div className="w-40 flex-shrink-0">
+                  <p className="text-sm text-muted-foreground mb-3 text-center">Preview</p>
+                  {(() => {
+                    const bg = PROFILE_BACKGROUNDS[selectedBackground];
+                    const isWhite = bg.textColor === 'white';
+                    return (
+                      <div
+                        className="rounded-xl border-2 border-border p-4 flex flex-col items-center text-center gap-2 shadow-md"
+                        style={selectedBackground === 'default' ? {} : bg.style}
+                      >
+                        <UserAvatar
+                          avatar={user.avatar}
+                          username={user.username}
+                          className="w-14 h-14 border-2 border-white/40"
+                          fallbackClassName="text-2xl"
+                        />
+                        <div>
+                          <p className={`text-sm font-semibold truncate max-w-[110px] drop-shadow-sm ${isWhite ? 'text-white' : ''}`}>
+                            {user.username}
+                          </p>
+                          <p className={`text-xs drop-shadow-sm ${isWhite ? 'text-white/70' : 'text-muted-foreground'}`}>
+                            USC Student
+                          </p>
+                        </div>
+                        <div className={`text-xs px-2 py-0.5 rounded-full border ${isWhite ? 'border-white/30 text-white/80' : 'border-border text-muted-foreground'}`}>
+                          {bg.label}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
               </div>
             </Card>
           </TabsContent>

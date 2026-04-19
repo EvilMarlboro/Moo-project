@@ -8,6 +8,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Users, Volume2, Heart, MessageCircle, X, Check } from 'lucide-react';
 import { Shield, MoreVertical } from 'lucide-react';
 import { CATEGORY_COLORS } from '../data/mockData';
+import { PROFILE_BACKGROUNDS, type BackgroundKey } from '../data/profileBackgrounds';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
 import { getCategoryForActivity, getRequiredFieldsForActivity } from '../data/activityHelpers';
@@ -27,6 +28,7 @@ interface OnlineUser {
   activities: string[];
   statusMessage?: string;
   vibingMode?: boolean;
+  profileBackground?: string;
   categories: string[];
   online_at: string;
 }
@@ -456,6 +458,7 @@ export function ActivityHub() {
         activities: user.enabledActivities || [],
         statusMessage: user.statusMessage || '',
         vibingMode: user.vibingMode || false,
+        profileBackground: user.profileBackground || 'default',
         categories,
         online_at: new Date().toISOString(),
       });
@@ -663,27 +666,35 @@ export function ActivityHub() {
       {/* User profile modal */}
       <Dialog open={!!selectedUser} onOpenChange={(open) => { if (!open) { setSelectedUser(null); setSelectedUserProfile(null); setSelectedUserReviews([]); } }}>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
-          {selectedUser && (
+          {selectedUser && (() => {
+            const modalBgKey = (selectedUser.profileBackground || 'default') as BackgroundKey;
+            const modalBg = PROFILE_BACKGROUNDS[modalBgKey] ?? PROFILE_BACKGROUNDS.default;
+            const modalHasBg = modalBgKey !== 'default';
+            return (
             <>
               <DialogHeader>
-                <div className="flex flex-col items-center text-center gap-3 mb-2">
+                <div
+                  className="flex flex-col items-center text-center gap-3 mb-2 -mx-6 -mt-6 pt-8 pb-6 px-6 rounded-t-lg"
+                  style={modalHasBg ? modalBg.style : {}}
+                >
                   <div className="relative">
                     <UserAvatar
                       avatar={selectedUser.avatar || '👤'}
                       username={selectedUser.username}
-                      className="w-36 h-36 border-[3px] border-purple-300"
-                      fallbackClassName="text-7xl bg-purple-50"
+                      className={`w-36 h-36 border-[3px] ${modalHasBg ? 'border-white/50' : 'border-purple-300'}`}
+                      fallbackClassName={`text-7xl ${modalHasBg ? '' : 'bg-purple-50'}`}
                     />
                     <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white" />
                   </div>
                   <div>
                     <div className="flex items-center justify-center gap-2">
-                      <DialogTitle className="text-2xl">{selectedUser.username}</DialogTitle>
+                      <DialogTitle className={`text-2xl ${modalHasBg ? 'text-white drop-shadow' : ''}`}>{selectedUser.username}</DialogTitle>
                       {selectedUser.genderSymbol && (
                         <span
                           className="text-2xl"
                           style={{
-                            color: selectedUser.genderSymbol === '♂' ? '#3B82F6'
+                            color: modalHasBg ? 'rgba(255,255,255,0.9)'
+                              : selectedUser.genderSymbol === '♂' ? '#3B82F6'
                               : selectedUser.genderSymbol === '♀' ? '#EC4899'
                               : '#9333EA',
                           }}
@@ -691,11 +702,11 @@ export function ActivityHub() {
                           {selectedUser.genderSymbol}
                         </span>
                       )}
-                      <Shield className="h-4 w-4 text-[#990000]" />
+                      <Shield className={`h-4 w-4 ${modalHasBg ? 'text-white/80' : 'text-[#990000]'}`} />
                     </div>
-                    <p className="text-sm text-muted-foreground">USC Student</p>
+                    <p className={`text-sm ${modalHasBg ? 'text-white/70' : 'text-muted-foreground'}`}>USC Student</p>
                     {selectedUser.statusMessage && (
-                      <DialogDescription className="italic mt-1">
+                      <DialogDescription className={`italic mt-1 ${modalHasBg ? 'text-white/80' : ''}`}>
                         "{selectedUser.statusMessage}"
                       </DialogDescription>
                     )}
@@ -813,7 +824,7 @@ export function ActivityHub() {
                 </div>
               )}
 
-              <DialogFooter>
+              <DialogFooter className="mt-2">
                 <Button
                   className="w-full"
                   style={
@@ -833,7 +844,8 @@ export function ActivityHub() {
                 </Button>
               </DialogFooter>
             </>
-          )}
+            );
+          })()}
         </DialogContent>
       </Dialog>
 
@@ -1030,12 +1042,19 @@ export function ActivityHub() {
                   const categoryLabels = (presenceUser.categories || []).map(c =>
                     c === 'campusEvents' ? 'Campus Events' : c.charAt(0).toUpperCase() + c.slice(1)
                   );
+                  const bgKey = (presenceUser.profileBackground || 'default') as BackgroundKey;
+                  const cardBg = PROFILE_BACKGROUNDS[bgKey] ?? PROFILE_BACKGROUNDS.default;
+                  const hasBg = bgKey !== 'default';
 
                   return (
                     <Card
                       key={presenceUser.user_id}
-                      className="p-5 bg-gradient-to-br from-white to-purple-50 border-2 hover:scale-[1.02] transition-all hover:shadow-xl cursor-pointer flex flex-col items-center text-center"
-                      style={{ borderColor: cardColor, boxShadow: `0 4px 20px ${cardColor}20` }}
+                      className="p-5 border-2 hover:scale-[1.02] transition-all hover:shadow-xl cursor-pointer flex flex-col items-center text-center"
+                      style={{
+                        borderColor: cardColor,
+                        boxShadow: `0 4px 20px ${cardColor}20`,
+                        ...(hasBg ? cardBg.style : { background: 'linear-gradient(to bottom right, white, #f5f3ff)' }),
+                      }}
                       onClick={() => openUserModal(presenceUser)}
                     >
                       {/* Avatar — large, centred */}
@@ -1052,12 +1071,13 @@ export function ActivityHub() {
 
                       {/* Name + gender + badge */}
                       <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <h3 className="font-semibold truncate max-w-[120px]">{presenceUser.username}</h3>
+                        <h3 className={`font-semibold truncate max-w-[120px] ${hasBg ? 'text-white drop-shadow' : ''}`}>{presenceUser.username}</h3>
                         {presenceUser.genderSymbol && (
                           <span
                             className="flex-shrink-0"
                             style={{
-                              color: presenceUser.genderSymbol === '♂' ? '#3B82F6'
+                              color: hasBg ? 'rgba(255,255,255,0.9)'
+                                : presenceUser.genderSymbol === '♂' ? '#3B82F6'
                                 : presenceUser.genderSymbol === '♀' ? '#EC4899'
                                 : cardColor,
                             }}
@@ -1065,21 +1085,21 @@ export function ActivityHub() {
                             {presenceUser.genderSymbol}
                           </span>
                         )}
-                        <Shield className="h-3.5 w-3.5 text-[#990000] flex-shrink-0" />
+                        <Shield className={`h-3.5 w-3.5 flex-shrink-0 ${hasBg ? 'text-white/80' : 'text-[#990000]'}`} />
                       </div>
 
                       {/* Category / vibing */}
                       <div className="mb-2 min-h-[1.25rem]">
                         {presenceUser.vibingMode ? (
-                          <span className="text-xs font-medium text-purple-600">🎵 Vibing</span>
+                          <span className={`text-xs font-medium ${hasBg ? 'text-white/90' : 'text-purple-600'}`}>🎵 Vibing</span>
                         ) : categoryLabels.length > 0 ? (
-                          <span className="text-xs text-muted-foreground">{categoryLabels.join(' • ')}</span>
+                          <span className={`text-xs ${hasBg ? 'text-white/70' : 'text-muted-foreground'}`}>{categoryLabels.join(' • ')}</span>
                         ) : null}
                       </div>
 
                       {/* Status message */}
                       {presenceUser.statusMessage && (
-                        <p className="text-xs text-muted-foreground italic line-clamp-2 mb-3 px-1">
+                        <p className={`text-xs italic line-clamp-2 mb-3 px-1 ${hasBg ? 'text-white/70' : 'text-muted-foreground'}`}>
                           "{presenceUser.statusMessage}"
                         </p>
                       )}

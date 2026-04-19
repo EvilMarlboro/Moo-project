@@ -14,6 +14,7 @@ export interface User {
   };
   statusMessage?: string;
   vibingMode?: boolean;
+  profileBackground?: string;
 }
 
 interface AuthContextType {
@@ -65,6 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             activityProfiles: profile.activity_profiles || {},
             statusMessage: profile.status_message || '',
             vibingMode: profile.vibing_mode || false,
+            profileBackground: profile.profile_background || 'default',
           });
         } else {
           setUser({
@@ -166,6 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (updates.activityProfiles) profileUpdates.activity_profiles = updates.activityProfiles;
       if (updates.statusMessage !== undefined) profileUpdates.status_message = updates.statusMessage;
       if (updates.vibingMode !== undefined) profileUpdates.vibing_mode = updates.vibingMode;
+      if (updates.profileBackground !== undefined) profileUpdates.profile_background = updates.profileBackground;
       
       if (Object.keys(profileUpdates).length > 0) {
         const { error } = await supabase
