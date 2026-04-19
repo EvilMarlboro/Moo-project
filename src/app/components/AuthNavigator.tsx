@@ -7,7 +7,7 @@ export function AuthNavigator() {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_OUT' && window.location.pathname !== '/login') {
         navigate('/');
       }
     });
