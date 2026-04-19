@@ -134,13 +134,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false);
         }
       } else if (event === 'SIGNED_OUT') {
-        // Delay clearing state — Supabase fires SIGNED_OUT during token refresh
-        // before immediately firing SIGNED_IN. Cancel if SIGNED_IN arrives first.
+        // Do NOT clear establishedUserIdRef here — token refresh fires SIGNED_OUT
+        // then SIGNED_IN in quick succession. If SIGNED_IN arrives within 500ms it
+        // cancels this timer and the ref stays set, blocking the duplicate call.
+        // establishedUserIdRef is only cleared when the timer fires (real signout confirmed).
         signOutTimerRef.current = setTimeout(() => {
           signOutTimerRef.current = null;
-          // Real sign-out (no SIGNED_IN followed) — purge any stale/revoked token from localStorage
-          supabase.auth.signOut();
           establishedUserIdRef.current = null;
+          supabase.auth.signOut();
           setSupabaseUserId(null);
           setUser(null);
           setLoading(false);
