@@ -109,13 +109,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           signOutTimerRef.current = null;
         }
         if (session?.user) {
-          if (!isRefreshingRef.current) {
-            isRefreshingRef.current = true;
-            try {
-              await refreshSession();
-            } finally {
-              isRefreshingRef.current = false;
-            }
+          // Ignore SIGNED_IN from token refresh if session is already established
+          if (event === 'SIGNED_IN' && supabaseUserId === session.user.id) {
+            console.log('[onAuthStateChange] SIGNED_IN ignored — session already established for uid:', session.user.id);
+            return;
+          }
+          if (isRefreshingRef.current) {
+            console.log('[onAuthStateChange] refreshSession already in progress — skipping duplicate call for event:', event);
+            return;
+          }
+          isRefreshingRef.current = true;
+          try {
+            await refreshSession();
+          } finally {
+            isRefreshingRef.current = false;
           }
         } else if (event === 'INITIAL_SESSION') {
           // No session on initial load — user is logged out
