@@ -59,6 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const profile = result && 'data' in result ? result.data : null;
         const timedOut = result === null;
         console.log('[refreshSession] profile:', profile, '| timed out:', timedOut);
+        console.log('[refreshSession] raw fields — display_name:', profile?.display_name, '| avatar:', profile?.avatar, '| enabled_activities:', profile?.enabled_activities, '| activity_profiles:', profile?.activity_profiles);
 
         if (profile && profile.display_name) {
           const userObj = {
