@@ -22,7 +22,7 @@ export function AuthNavigator() {
         const result = await Promise.race([profileQuery, profileTimeout]);
         const profile = result && 'data' in result ? result.data : null;
 
-        navigate(profile?.display_name && profile?.avatar ? '/activity-hub' : '/profile-setup');
+        navigate(profile && !profile.display_name && !profile.avatar ? '/profile-setup' : '/activity-hub');
       }
 
       if (event === 'SIGNED_OUT') {
