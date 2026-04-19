@@ -391,6 +391,15 @@ export function ActivityHub() {
   );
   const [activeActivity, setActiveActivity] = useState<string | 'all'>('all');
 
+  // Sync activeCategory when user's enabled categories load after session restore
+  useEffect(() => {
+    if (enabledCategories.length > 0) {
+      setActiveCategory(prev =>
+        enabledCategories.includes(prev) ? prev : enabledCategories[0]
+      );
+    }
+  }, [enabledCategories]);
+
   // Subscribe to Supabase Realtime Presence
   useEffect(() => {
     if (!user || !supabaseUserId) return;
