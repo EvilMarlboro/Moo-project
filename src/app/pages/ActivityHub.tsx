@@ -52,6 +52,7 @@ export function ActivityHub() {
   useEffect(() => {
     if (user === undefined) return;
     if (user === null) navigate('/');
+    if (user && user.username === '') navigate('/profile-setup', { replace: true });
   }, [user, navigate]);
 
   const [statusMessage, setStatusMessage] = useState(user?.statusMessage || '');
