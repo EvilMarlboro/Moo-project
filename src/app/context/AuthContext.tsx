@@ -40,14 +40,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setSupabaseUserId(session.user.id);
-        setUser({
-          id: session.user.id,
-          username: '',
-          email: session.user.email || '',
-          avatar: '👤',
-          enabledActivities: [],
-          activityProfiles: {},
-        });
+
+        const profileQuery = supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        const profileTimeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 5000));
+        const result = await Promise.race([profileQuery, profileTimeout]);
+        const profile = result && 'data' in result ? result.data : null;
+
+        if (profile && profile.display_name) {
+          setUser({
+            id: session.user.id,
+            username: profile.display_name,
+            email: session.user.email || '',
+            avatar: profile.avatar || '👤',
+            genderSymbol: profile.gender,
+            enabledActivities: profile.enabled_activities || [],
+            activityProfiles: profile.activity_profiles || {},
+            statusMessage: profile.status_message || '',
+            vibingMode: profile.vibing_mode || false,
+          });
+        } else {
+          setUser({
+            id: session.user.id,
+            username: '',
+            email: session.user.email || '',
+            avatar: '👤',
+            enabledActivities: [],
+            activityProfiles: {},
+          });
+        }
       } else {
         setSupabaseUserId(null);
         setUser(null);
