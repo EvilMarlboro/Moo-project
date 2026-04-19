@@ -74,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
           console.log('[refreshSession] setting full user:', userObj);
           setUser(userObj);
+          console.log('[refreshSession] setUser(full) called');
         } else {
           const fallbackUser = {
             id: session.user.id,
@@ -85,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
           console.log('[refreshSession] setting fallback user (no profile / timeout):', fallbackUser);
           setUser(fallbackUser);
+          console.log('[refreshSession] setUser(fallback) called');
         }
       } else {
         console.log('[refreshSession] no session — clearing user');
@@ -142,6 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // cancels this timer and the ref stays set, blocking the duplicate call.
         // establishedUserIdRef is only cleared when the timer fires (real signout confirmed).
         signOutTimerRef.current = setTimeout(() => {
+          console.log('[onAuthStateChange] SIGNED_OUT timer fired — clearing user state');
           signOutTimerRef.current = null;
           establishedUserIdRef.current = null;
           supabase.auth.signOut();
