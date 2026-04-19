@@ -73,7 +73,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             vibingMode: profile.vibing_mode || false,
           };
           console.log('[refreshSession] setting full user:', userObj);
-          establishedUserIdRef.current = session.user.id;
           setUser(userObj);
         } else {
           const fallbackUser = {
@@ -85,7 +84,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             activityProfiles: {},
           };
           console.log('[refreshSession] setting fallback user (no profile / timeout):', fallbackUser);
-          establishedUserIdRef.current = session.user.id;
           setUser(fallbackUser);
         }
       } else {
@@ -112,7 +110,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           signOutTimerRef.current = null;
         }
         if (session?.user) {
-          // Ignore SIGNED_IN from token refresh if session is already established
+          // Ignore SIGNED_IN from token refresh if session is already established.
+          // Check is synchronous so a second SIGNED_IN firing before refreshSession
+          // finishes is blocked immediately.
           if (event === 'SIGNED_IN' && establishedUserIdRef.current === session.user.id) {
             console.log('[onAuthStateChange] SIGNED_IN ignored — session already established for uid:', session.user.id);
             return;
@@ -121,6 +121,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.log('[onAuthStateChange] refreshSession already in progress — skipping duplicate call for event:', event);
             return;
           }
+          // Set ref synchronously before the async refreshSession so any
+          // subsequent SIGNED_IN for the same uid is blocked immediately.
+          establishedUserIdRef.current = session.user.id;
           isRefreshingRef.current = true;
           try {
             await refreshSession();
