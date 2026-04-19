@@ -76,7 +76,10 @@ export function LoginPage() {
         } else {
           setError('Invalid email or password');
         }
+        return;
       }
+
+      navigate('/activity-hub');
     } catch (err) {
       setError('Sign in failed. Please try again.');
     } finally {
