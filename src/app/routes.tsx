@@ -12,21 +12,17 @@ import { ActivityProfileManager } from './pages/ActivityProfileManager';
 import { Settings } from './pages/Settings';
 import { NotFound } from './pages/NotFound';
 import { LoginPage } from './pages/LoginPage';
-import { AuthProvider } from './context/AuthContext';
-import { MatchProvider } from './context/MatchContext';
 import { MatchClearer } from './components/MatchClearer';
 import { AuthNavigator } from './components/AuthNavigator';
 
-// Root component that provides context to all routes
+// Root component that provides layout and global listeners to all routes
 function RootLayout() {
   return (
-    <AuthProvider>
-      <MatchProvider>
-        <MatchClearer />
-        <AuthNavigator />
-        <Layout />
-      </MatchProvider>
-    </AuthProvider>
+    <>
+      <MatchClearer />
+      <AuthNavigator />
+      <Layout />
+    </>
   );
 }
 
