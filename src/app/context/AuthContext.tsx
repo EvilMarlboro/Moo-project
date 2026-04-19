@@ -112,6 +112,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           signOutTimerRef.current = null;
         }
         if (session?.user) {
+          if (event === 'SIGNED_IN') {
+            console.log('[onAuthStateChange] SIGNED_IN check — establishedUserIdRef.current:', establishedUserIdRef.current, '| session.user.id:', session.user.id, '| match:', establishedUserIdRef.current === session.user.id);
+          }
           // Ignore SIGNED_IN from token refresh if session is already established.
           // Check is synchronous so a second SIGNED_IN firing before refreshSession
           // finishes is blocked immediately.
