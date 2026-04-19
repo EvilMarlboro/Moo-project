@@ -128,6 +128,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // before immediately firing SIGNED_IN. Cancel if SIGNED_IN arrives first.
         signOutTimerRef.current = setTimeout(() => {
           signOutTimerRef.current = null;
+          // Real sign-out (no SIGNED_IN followed) — purge any stale/revoked token from localStorage
+          supabase.auth.signOut();
           setSupabaseUserId(null);
           setUser(null);
           setLoading(false);

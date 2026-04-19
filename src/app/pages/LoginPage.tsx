@@ -72,7 +72,6 @@ export function LoginPage() {
     }, 10000);
 
     try {
-      await supabase.auth.signOut();
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
