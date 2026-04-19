@@ -5,7 +5,6 @@
   import { AuthProvider } from "./app/context/AuthContext.tsx";
   import { MatchProvider } from "./app/context/MatchContext.tsx";
 
-  console.log('[main.tsx] createRoot render called');
   createRoot(document.getElementById("root")!).render(
     <AuthProvider>
       <MatchProvider>

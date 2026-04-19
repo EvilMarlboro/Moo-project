@@ -38,15 +38,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const establishedUserIdRef = useRef<string | null>(null);
 
   const refreshSession = async () => {
-    console.log('[refreshSession] start');
     try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      console.log('[refreshSession] getSession complete — session:', session ? `exists (uid: ${session.user.id})` : 'null', '| error:', sessionError);
+      const { data: { session } } = await supabase.auth.getSession();
 
       if (session?.user) {
         setSupabaseUserId(session.user.id);
 
-        console.log('[refreshSession] starting profiles query for uid:', session.user.id);
         const profileQuery = supabase
           .from('profiles')
           .select('*')
@@ -54,15 +51,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .single();
         const profileTimeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 5000));
         const result = await Promise.race([profileQuery, profileTimeout]);
-        console.log('[refreshSession] profiles race resolved — result:', result);
 
         const profile = result && 'data' in result ? result.data : null;
-        const timedOut = result === null;
-        console.log('[refreshSession] profile:', profile, '| timed out:', timedOut);
-        console.log('[refreshSession] raw fields — display_name:', profile?.display_name, '| avatar:', profile?.avatar, '| enabled_activities:', profile?.enabled_activities, '| activity_profiles:', profile?.activity_profiles);
 
         if (profile && profile.display_name) {
-          const userObj = {
+          setUser({
             id: session.user.id,
             username: profile.display_name,
             email: session.user.email || '',
@@ -72,45 +65,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             activityProfiles: profile.activity_profiles || {},
             statusMessage: profile.status_message || '',
             vibingMode: profile.vibing_mode || false,
-          };
-          console.log('[refreshSession] setting full user:', userObj);
-          setUser(userObj);
-          console.log('[refreshSession] setUser(full) called');
+          });
         } else {
-          const fallbackUser = {
+          setUser({
             id: session.user.id,
             username: '',
             email: session.user.email || '',
             avatar: '👤',
             enabledActivities: [],
             activityProfiles: {},
-          };
-          console.log('[refreshSession] setting fallback user (no profile / timeout):', fallbackUser);
-          setUser(fallbackUser);
-          console.log('[refreshSession] setUser(fallback) called');
+          });
         }
       } else {
-        console.log('[refreshSession] no session — clearing user');
         setSupabaseUserId(null);
         setUser(null);
       }
     } catch (err) {
-      console.error('[refreshSession] caught error:', err);
+      console.error('Error refreshing session:', err);
     } finally {
-      console.log('[refreshSession] complete — setLoading(false)');
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    console.log('[AuthProvider] MOUNTED');
-    return () => console.log('[AuthProvider] UNMOUNTED');
-  }, []);
-
-  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[onAuthStateChange] event:', event, '| session:', session ? `exists (uid: ${session.user.id})` : 'null');
-
       if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
         // Cancel any pending sign-out clear (token refresh fires SIGNED_OUT then SIGNED_IN)
         if (signOutTimerRef.current) {
@@ -118,18 +96,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           signOutTimerRef.current = null;
         }
         if (session?.user) {
-          if (event === 'SIGNED_IN') {
-            console.log('[onAuthStateChange] SIGNED_IN check — establishedUserIdRef.current:', establishedUserIdRef.current, '| session.user.id:', session.user.id, '| match:', establishedUserIdRef.current === session.user.id);
-          }
           // Ignore SIGNED_IN from token refresh if session is already established.
           // Check is synchronous so a second SIGNED_IN firing before refreshSession
           // finishes is blocked immediately.
           if (event === 'SIGNED_IN' && establishedUserIdRef.current === session.user.id) {
-            console.log('[onAuthStateChange] SIGNED_IN ignored — session already established for uid:', session.user.id);
             return;
           }
           if (isRefreshingRef.current) {
-            console.log('[onAuthStateChange] refreshSession already in progress — skipping duplicate call for event:', event);
             return;
           }
           // Set ref synchronously before the async refreshSession so any
@@ -153,7 +126,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // cancels this timer and the ref stays set, blocking the duplicate call.
         // establishedUserIdRef is only cleared when the timer fires (real signout confirmed).
         signOutTimerRef.current = setTimeout(() => {
-          console.log('[onAuthStateChange] SIGNED_OUT timer fired — clearing user state');
           signOutTimerRef.current = null;
           establishedUserIdRef.current = null;
           supabase.auth.signOut();

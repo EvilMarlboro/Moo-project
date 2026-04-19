@@ -6,7 +6,6 @@ import { useAuth } from '../context/AuthContext';
 export function Navbar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  console.log('[Navbar] render — user:', user ? `${user.username || '(no username)'} (${user.email})` : 'null');
 
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b-2 border-purple-200 shadow-md">
