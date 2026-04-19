@@ -198,12 +198,6 @@ CREATE TRIGGER update_chats_updated_at
 -- 9. ENABLE REALTIME
 -- =============================================
 
--- Enable realtime for match_requests (for live updates)
-ALTER PUBLICATION supabase_realtime ADD TABLE match_requests;
-
--- Enable realtime for messages (for live chat)
-ALTER PUBLICATION supabase_realtime ADD TABLE messages;
-
 -- Enable realtime for chats (for new chat notifications)
 ALTER PUBLICATION supabase_realtime ADD TABLE chats;
 

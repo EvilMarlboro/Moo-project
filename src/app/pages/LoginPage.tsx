@@ -72,50 +72,49 @@ export function LoginPage() {
     }
 
     setLoading(true);
+    let didNavigate = false;
 
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
-
-    if (authError) {
-      setLoading(false);
-      if (authError.message?.includes('Email not confirmed')) {
-        setEmailNotConfirmed(true);
-        setError('Please confirm your USC email first. Check your inbox for a verification link.');
-      } else {
-        setError('Invalid email or password');
-      }
-      return;
-    }
-
-    // Add timeout - if profile check takes too long, go to activity-hub
     const timeout = setTimeout(() => {
-      setLoading(false);
-      navigate('/activity-hub');
-    }, 3000);
+      if (!didNavigate) {
+        setLoading(false);
+        setError('Sign in is taking too long. Please check your connection and try again.');
+      }
+    }, 10000);
 
     try {
-      await refreshSession();
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id, display_name, avatar')
-        .eq('id', data.user.id)
-        .single();
-
-      clearTimeout(timeout);
-      setLoading(false);
-
-      if (profile && profile.display_name && profile.avatar) {
-        navigate('/activity-hub');
-      } else {
-        navigate('/profile-setup');
+      if (authError) {
+        if (authError.message?.includes('Email not confirmed')) {
+          setEmailNotConfirmed(true);
+          setError('Please confirm your USC email first. Check your inbox for a verification link.');
+        } else {
+          setError('Invalid email or password');
+        }
+        return;
       }
-    } catch (err) {
+
+      try {
+        await refreshSession();
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id, display_name, avatar')
+          .eq('id', data.user.id)
+          .single();
+        didNavigate = true;
+        navigate(profile?.display_name && profile?.avatar ? '/activity-hub' : '/profile-setup');
+      } catch {
+        didNavigate = true;
+        navigate('/activity-hub');
+      }
+    } catch {
+      setError('Sign in failed. Please try again.');
+    } finally {
       clearTimeout(timeout);
       setLoading(false);
-      navigate('/activity-hub');
     }
   };
 
