@@ -102,6 +102,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    console.log('[AuthProvider] MOUNTED');
+    return () => console.log('[AuthProvider] UNMOUNTED');
+  }, []);
+
+  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('[onAuthStateChange] event:', event, '| session:', session ? `exists (uid: ${session.user.id})` : 'null');
 
