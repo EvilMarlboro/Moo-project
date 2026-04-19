@@ -2,21 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionTemplate } from 'motion/react';
 import { useNavigate } from 'react-router';
 import imgCow from "figma:asset/6316add42ccca59a60d0bddbe5aa1b477fd16b09.png";
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasScrolledPast, setHasScrolledPast] = useState(false);
-  
+
   // Auto-redirect logged-in users to activity hub
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate('/activity-hub', { replace: true });
-      }
-    });
-  }, [navigate]);
+    if (loading) return;
+    if (user) navigate('/activity-hub', { replace: true });
+  }, [user, loading, navigate]);
 
   // Track window scroll instead of container scroll
   const { scrollY } = useScroll();

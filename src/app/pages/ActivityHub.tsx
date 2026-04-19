@@ -49,7 +49,7 @@ export function ActivityHub() {
   // Redirect unauthenticated users to browse hub
   useEffect(() => {
     if (loading) return;
-    if (!user) navigate('/browse-hub');
+    if (!user) navigate('/');
   }, [user, loading, navigate]);
 
   const [statusMessage, setStatusMessage] = useState(user?.statusMessage || '');
