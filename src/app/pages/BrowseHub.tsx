@@ -158,7 +158,7 @@ export function BrowseHub() {
             <Button
               onClick={() => navigate('/login')}
               size="lg"
-              className="bg-[#990000] hover:bg-[#7a0000] text-white px-12"
+              className="bg-[#990000] hover:bg-[#7a0000] text-white w-full sm:w-auto sm:px-12"
             >
               Sign In with USC to Connect
             </Button>
@@ -199,7 +199,7 @@ export function BrowseHub() {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
                   >
-                    <div className="mb-4 flex items-center justify-between">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <Users className="h-5 w-5 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">
@@ -212,7 +212,7 @@ export function BrowseHub() {
 
                     {filteredUsers.length > 0 ? (
                       <motion.div
-                        className="grid md:grid-cols-2 lg:grid-cols-3 gap-4"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.4, delay: 0.1 }}

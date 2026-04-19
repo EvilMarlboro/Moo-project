@@ -336,9 +336,9 @@ export function Chat() {
           Back
         </Button>
 
-        <div className="flex gap-4 items-start">
+        <div className="flex flex-col lg:flex-row gap-4 lg:items-start">
           {/* Main chat column */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 min-h-0">
             {/* Chat Header */}
             <Card className="p-4 mb-4 border-2" style={{ borderColor: categoryColor }}>
               <div className="flex items-center justify-between">
@@ -416,7 +416,7 @@ export function Chat() {
             </Card>
 
             {/* Messages */}
-            <Card className="p-4 mb-4 min-h-[400px] max-h-[500px] overflow-y-auto bg-card">
+            <Card className="p-4 mb-4 min-h-[300px] sm:min-h-[400px] max-h-[400px] sm:max-h-[500px] overflow-y-auto bg-card">
               {messages.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <p>No messages yet. Start the conversation!</p>
@@ -510,7 +510,7 @@ export function Chat() {
 
           {/* Profile Sidebar */}
           {showSidebar && (
-            <div className="w-72 flex-shrink-0 sticky top-4 space-y-4">
+            <div className="w-full lg:w-72 lg:flex-shrink-0 lg:sticky lg:top-4 space-y-4">
               <Card className="p-4 border-border">
                 {/* Avatar + basic info */}
                 <div className="text-center mb-4">

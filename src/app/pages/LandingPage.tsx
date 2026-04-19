@@ -73,11 +73,11 @@ export function LandingPage() {
         }}
       >
         {/* Container for centered content - moved up */}
-        <div className="flex flex-col items-center gap-6 max-w-4xl mx-auto px-8 -mt-40">
+        <div className="flex flex-col items-center gap-4 sm:gap-6 max-w-4xl mx-auto px-4 sm:px-8 -mt-16 sm:-mt-32 lg:-mt-40">
           {/* MOO Title with Eyes and Cow side by side */}
-          <div className="relative flex items-center gap-0">
+          <div className="relative flex items-center gap-0 scale-[0.5] sm:scale-[0.75] lg:scale-100 origin-center">
             {/* Cow Image - Next to the M, not overlapping */}
-            <motion.div 
+            <motion.div
               className="size-[200px] flex-shrink-0"
               initial={{ x: -100, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -176,13 +176,13 @@ export function LandingPage() {
           </div>
 
           {/* Tagline - Centered below MOO icon and cow */}
-          <motion.div 
-            className="text-center max-w-lg"
+          <motion.div
+            className="text-center max-w-lg px-4"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.5 }}
           >
-            <p className="font-['Galindo',sans-serif] text-[#f5f5f5] text-[16px] leading-relaxed drop-shadow-md">
+            <p className="font-['Galindo',sans-serif] text-[#f5f5f5] text-[13px] sm:text-[16px] leading-relaxed drop-shadow-md">
               Match instantly with verified USC students for gaming, sports, studying, campus events, or casual hangouts — all in real time.
             </p>
           </motion.div>
@@ -205,10 +205,10 @@ export function LandingPage() {
               ease: "easeInOut"
             }}
           >
-            <p className="font-['Galindo',sans-serif] text-[#f5f5f5] text-[28px] leading-tight drop-shadow-lg mb-0">
+            <p className="font-['Galindo',sans-serif] text-[#f5f5f5] text-[20px] sm:text-[28px] leading-tight drop-shadow-lg mb-0">
               Scroll Down To
             </p>
-            <p className="font-['Galindo',sans-serif] text-[#f5f5f5] text-[28px] leading-tight drop-shadow-lg">
+            <p className="font-['Galindo',sans-serif] text-[#f5f5f5] text-[20px] sm:text-[28px] leading-tight drop-shadow-lg">
               Start
             </p>
             <motion.div 

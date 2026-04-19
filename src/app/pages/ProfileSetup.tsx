@@ -160,7 +160,7 @@ export function ProfileSetup() {
             <p className="text-muted-foreground">Select an avatar to represent you on the platform</p>
           </div>
 
-          <div className="grid grid-cols-4 md:grid-cols-6 gap-4 mb-8">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 sm:gap-4 mb-8">
             {AVATAR_OPTIONS.map(avatar => (
               <button
                 key={avatar.id}

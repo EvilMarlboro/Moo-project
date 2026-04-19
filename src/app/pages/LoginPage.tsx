@@ -58,7 +58,7 @@ export function LoginPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-sm"
       >
-        <Card className="p-10 bg-card border-border text-center">
+        <Card className="p-6 sm:p-10 bg-card border-border text-center">
           {/* Branding */}
           <div className="mb-8">
             <Shield className="h-12 w-12 mx-auto mb-4 text-[#990000]" />

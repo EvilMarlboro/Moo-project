@@ -246,20 +246,22 @@ export function Settings() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full mb-6">
-            <TabsTrigger value="profile" className="flex-1">
-              <User className="h-4 w-4 mr-2" />
-              User Profile
-            </TabsTrigger>
-            <TabsTrigger value="activities" className="flex-1">
-              <Activity className="h-4 w-4 mr-2" />
-              Activity Profiles
-            </TabsTrigger>
-            <TabsTrigger value="stats" className="flex-1">
-              <BarChart2 className="h-4 w-4 mr-2" />
-              Stats
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto mb-6">
+            <TabsList className="w-full min-w-[360px]">
+              <TabsTrigger value="profile" className="flex-1">
+                <User className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="text-xs sm:text-sm">Profile</span>
+              </TabsTrigger>
+              <TabsTrigger value="activities" className="flex-1">
+                <Activity className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="text-xs sm:text-sm">Activities</span>
+              </TabsTrigger>
+              <TabsTrigger value="stats" className="flex-1">
+                <BarChart2 className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="text-xs sm:text-sm">Stats</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* User Profile Tab */}
           <TabsContent value="profile">
@@ -427,9 +429,9 @@ export function Settings() {
                 <h3>Profile Card Background</h3>
               </div>
 
-              <div className="flex gap-6 items-start">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start">
                 {/* Swatches grid */}
-                <div className="flex-1">
+                <div className="flex-1 w-full">
                   <p className="text-sm text-muted-foreground mb-3">Choose a background for your profile card</p>
                   <div className="grid grid-cols-5 gap-2">
                     {(Object.keys(PROFILE_BACKGROUNDS) as BackgroundKey[]).map(key => {
@@ -464,7 +466,7 @@ export function Settings() {
                 </div>
 
                 {/* Live preview */}
-                <div className="w-40 flex-shrink-0">
+                <div className="w-full sm:w-40 sm:flex-shrink-0">
                   <p className="text-sm text-muted-foreground mb-3 text-center">Preview</p>
                   {(() => {
                     const bg = PROFILE_BACKGROUNDS[selectedBackground];
@@ -694,7 +696,7 @@ export function Settings() {
               ) : (
                 <>
                   {/* Summary cards */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <Card className="p-5">
                       <div className="flex items-center gap-3 mb-1">
                         <Heart className="h-5 w-5 text-purple-600" />

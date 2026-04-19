@@ -865,9 +865,9 @@ export function ActivityHub() {
           </p>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
           {/* Left Sidebar */}
-          <div className="w-64 flex-shrink-0 space-y-6">
+          <div className="w-full lg:w-64 lg:flex-shrink-0 space-y-4 order-2 lg:order-1">
             {/* Match Requests */}
             <Card className="p-4 border-2 border-border">
               <div className="flex items-center gap-2 mb-4">
@@ -982,7 +982,7 @@ export function ActivityHub() {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 order-1 lg:order-2">
             {/* Greeting banner */}
             <div className="relative overflow-hidden rounded-2xl mb-6 p-5"
               style={{ background: 'linear-gradient(135deg, #7C3AED22 0%, #EC489922 50%, #FBBF2422 100%)' }}>
@@ -999,7 +999,7 @@ export function ActivityHub() {
             </div>
 
             {/* Header row */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <span className="font-medium">
@@ -1151,8 +1151,8 @@ export function ActivityHub() {
           </div>
 
           {/* Right Sidebar — Recent Matches */}
-          <div className="w-72 flex-shrink-0">
-            <Card className="p-4 border-2 border-border sticky top-4">
+          <div className="w-full lg:w-72 lg:flex-shrink-0 order-3">
+            <Card className="p-4 border-2 border-border lg:sticky lg:top-4">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-lg">⭐</span>
                 <h3 className="text-lg">Recent Matches</h3>
@@ -1163,7 +1163,7 @@ export function ActivityHub() {
                   No matches in the past 7 days
                 </p>
               ) : (
-                <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
+                <div className="space-y-4 max-h-[400px] lg:max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
                   {recentMatches.map(match => {
                     const existing = existingReviews[match.chat_id];
                     const pendingRating = pendingRatings[match.chat_id] ?? 0;
