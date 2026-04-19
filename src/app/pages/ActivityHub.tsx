@@ -53,6 +53,19 @@ function formatFieldName(field: string): string {
   return field.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
 }
 
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks}w ago`;
+  return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 function StarRating({
   rating,
   onChange,
@@ -481,7 +494,8 @@ export function ActivityHub() {
       supabase.from('reviews')
         .select('rating, comment, created_at, reviewer_id')
         .eq('reviewed_id', presenceUser.user_id)
-        .order('created_at', { ascending: false }),
+        .order('created_at', { ascending: false })
+        .limit(5),
     ]);
 
     setSelectedUserProfile(profileResult.data?.activity_profiles || {});
@@ -490,12 +504,18 @@ export function ActivityHub() {
     const reviews = reviewResult.data || [];
     if (reviews.length > 0) {
       const reviewerIds = reviews.map((r: any) => r.reviewer_id);
-      const { data: nameData } = await supabase
+      const { data: profileData } = await supabase
         .from('profiles')
-        .select('id, display_name')
+        .select('id, display_name, avatar')
         .in('id', reviewerIds);
-      const nameMap = Object.fromEntries((nameData || []).map((p: any) => [p.id, p.display_name || 'USC Student']));
-      setSelectedUserReviews(reviews.map((r: any) => ({ ...r, reviewer_name: nameMap[r.reviewer_id] || 'USC Student' })));
+      const profileMap = Object.fromEntries(
+        (profileData || []).map((p: any) => [p.id, { name: p.display_name || 'USC Student', avatar: p.avatar || '👤' }])
+      );
+      setSelectedUserReviews(reviews.map((r: any) => ({
+        ...r,
+        reviewer_name: profileMap[r.reviewer_id]?.name || 'USC Student',
+        reviewer_avatar: profileMap[r.reviewer_id]?.avatar || '👤',
+      })));
     } else {
       setSelectedUserReviews([]);
     }
@@ -694,42 +714,6 @@ export function ActivityHub() {
                 </div>
               </div>
 
-              {/* Reviews section */}
-              <div className="mb-2 px-1">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Reviews</p>
-                  {avgRating !== null && (
-                    <div className="flex items-center gap-1.5">
-                      <StarRating rating={Math.round(avgRating)} size="sm" />
-                      <span className="text-sm font-semibold">{avgRating.toFixed(1)}</span>
-                      <span className="text-xs text-muted-foreground">({selectedUserReviews.length})</span>
-                    </div>
-                  )}
-                </div>
-                {profileLoading ? null : selectedUserReviews.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-2">No reviews yet</p>
-                ) : (
-                  <div className="space-y-2">
-                    {selectedUserReviews.slice(0, 3).map((review: any, i: number) => (
-                      <div key={i} className="p-2.5 rounded-lg bg-secondary/40 border border-border">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-medium">{review.reviewer_name}</span>
-                          <div className="flex items-center gap-1.5">
-                            <StarRating rating={review.rating} size="sm" />
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(review.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                            </span>
-                          </div>
-                        </div>
-                        {review.comment && (
-                          <p className="text-xs text-muted-foreground italic">"{review.comment}"</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
               <div className="py-2">
                 {selectedUser.vibingMode ? (
                   <div className="p-3 rounded-lg bg-purple-50 border border-purple-200 mb-4">
@@ -783,6 +767,51 @@ export function ActivityHub() {
                   </>
                 )}
               </div>
+
+              {/* Reviews section */}
+              {!profileLoading && (
+                <div className="pt-2 pb-1">
+                  <div className="flex items-center gap-2 mb-3">
+                    <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Reviews</h4>
+                    {avgRating !== null && (
+                      <div className="flex items-center gap-1.5 ml-auto bg-yellow-50 border border-yellow-200 rounded-full px-3 py-1">
+                        <span className="text-yellow-500 text-sm">⭐</span>
+                        <span className="text-sm font-bold text-yellow-700">{avgRating.toFixed(1)}</span>
+                        <span className="text-xs text-muted-foreground">/ 5</span>
+                        <span className="text-xs text-muted-foreground">({selectedUserReviews.length} {selectedUserReviews.length === 1 ? 'review' : 'reviews'})</span>
+                      </div>
+                    )}
+                  </div>
+                  {selectedUserReviews.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-3">No reviews yet</p>
+                  ) : (
+                    <div className="space-y-2.5">
+                      {selectedUserReviews.map((review: any, i: number) => (
+                        <div key={i} className="p-3 rounded-lg bg-secondary/40 border border-border">
+                          <div className="flex items-start gap-2.5 mb-1.5">
+                            <UserAvatar
+                              avatar={review.reviewer_avatar}
+                              username={review.reviewer_name}
+                              className="w-7 h-7 flex-shrink-0"
+                              fallbackClassName="text-sm"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs font-semibold truncate">{review.reviewer_name}</span>
+                                <span className="text-xs text-muted-foreground flex-shrink-0">{timeAgo(review.created_at)}</span>
+                              </div>
+                              <StarRating rating={review.rating} size="sm" />
+                            </div>
+                          </div>
+                          {review.comment && (
+                            <p className="text-xs text-muted-foreground italic pl-9">"{review.comment}"</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <DialogFooter>
                 <Button
