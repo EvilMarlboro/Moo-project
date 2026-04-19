@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 
 export interface User {
@@ -33,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const isRefreshingRef = useRef(false);
 
   const refreshSession = async () => {
     try {
@@ -81,8 +82,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         setSupabaseUserId(session.user.id);
-        // Trigger a refresh to load profile
-        await refreshSession();
+        if (!isRefreshingRef.current) {
+          isRefreshingRef.current = true;
+          try {
+            await refreshSession();
+          } finally {
+            isRefreshingRef.current = false;
+          }
+        }
       } else if (event === 'SIGNED_OUT') {
         setSupabaseUserId(null);
         setUser(null);

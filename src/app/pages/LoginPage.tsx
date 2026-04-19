@@ -7,11 +7,8 @@ import { Card } from '../components/ui/card';
 import { Label } from '../components/ui/label';
 import { Shield, Mail, Lock, AlertCircle, CheckCircle, Eye, EyeOff, X, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
-
 export function LoginPage() {
   const navigate = useNavigate();
-  const { refreshSession } = useAuth();
 
   // Auto-redirect logged-in users to activity hub
   useEffect(() => {
@@ -98,7 +95,6 @@ export function LoginPage() {
       }
 
       try {
-        await refreshSession();
         const { data: profile } = await supabase
           .from('profiles')
           .select('id, display_name, avatar')
