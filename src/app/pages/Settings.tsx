@@ -197,7 +197,13 @@ export function Settings() {
   const currentAvatar = AVATAR_OPTIONS.find(a => a.id === editedAvatar);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background overflow-x-hidden">
+      {/* Background blobs */}
+      <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full bg-purple-400/12 blur-[90px]" />
+        <div className="absolute top-1/2 -right-24 w-80 h-80 rounded-full bg-pink-400/8 blur-[70px]" />
+        <div className="absolute -bottom-24 left-1/3 w-[380px] h-[380px] rounded-full bg-amber-300/8 blur-[80px]" />
+      </div>
       <Navbar />
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">

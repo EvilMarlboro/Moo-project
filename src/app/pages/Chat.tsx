@@ -299,8 +299,15 @@ export function Chat() {
   const hasSharedGaming = sharedGamingActivities.length > 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background overflow-x-hidden">
       <Navbar />
+
+      {/* Background blobs */}
+      <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full blur-[90px]"
+          style={{ backgroundColor: categoryColor + '18' }} />
+        <div className="absolute -bottom-24 -right-24 w-[380px] h-[380px] rounded-full bg-purple-400/8 blur-[80px]" />
+      </div>
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         {/* Back Button */}

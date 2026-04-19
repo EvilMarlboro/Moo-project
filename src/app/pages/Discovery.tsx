@@ -9,6 +9,10 @@ import { getActivitiesInCategory } from '../data/activityHelpers';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
 
+const CATEGORY_EMOJI: Record<string, string> = {
+  gaming: '🎮', sports: '⚽', studying: '📚', campusEvents: '🎉',
+};
+
 type Category = keyof typeof ACTIVITIES;
 
 export function Discovery() {
@@ -59,7 +63,13 @@ export function Discovery() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background overflow-x-hidden">
+      {/* Background blobs */}
+      <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-[420px] h-[420px] rounded-full bg-purple-400/15 blur-[90px]" />
+        <div className="absolute top-1/3 -right-24 w-80 h-80 rounded-full bg-amber-300/12 blur-[80px]" />
+        <div className="absolute -bottom-24 left-1/3 w-[380px] h-[380px] rounded-full bg-green-300/10 blur-[80px]" />
+      </div>
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">
@@ -97,6 +107,7 @@ export function Discovery() {
             return (
               <div key={key}>
                 <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">{CATEGORY_EMOJI[key]}</span>
                   <div className="w-1 h-8 rounded-full" style={{ backgroundColor: color }} />
                   <h2 style={{ color }}>{name}</h2>
                 </div>

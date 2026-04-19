@@ -111,13 +111,23 @@ export function BrowseHub() {
 
   const onlineCount = otherUsers.length;
 
+  const CATEGORY_EMOJI: Record<string, string> = {
+    sports: '⚽', gaming: '🎮', studying: '📚', campusEvents: '🎉',
+  };
+
   return (
     <motion.div
-      className="min-h-screen bg-background"
+      className="relative min-h-screen bg-background overflow-x-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeIn' }}
     >
+      {/* Background blobs */}
+      <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-40 -right-32 w-[450px] h-[450px] rounded-full bg-purple-400/12 blur-[100px]" />
+        <div className="absolute top-1/2 -left-24 w-96 h-96 rounded-full bg-pink-400/10 blur-[80px]" />
+        <div className="absolute -bottom-32 right-1/4 w-[420px] h-[420px] rounded-full bg-amber-300/10 blur-[90px]" />
+      </div>
       <Navbar />
 
       <motion.div
@@ -163,17 +173,15 @@ export function BrowseHub() {
                 <TabsTrigger
                   key={category}
                   value={category}
-                  className="capitalize transition-all duration-300"
+                  className="transition-all duration-300 gap-1"
                   style={
                     activeCategory === category
-                      ? {
-                          backgroundColor: CATEGORY_COLORS[category],
-                          color: 'white',
-                        }
+                      ? { backgroundColor: CATEGORY_COLORS[category], color: 'white' }
                       : {}
                   }
                 >
-                  {category === 'campusEvents' ? 'Campus Events' : category}
+                  <span>{CATEGORY_EMOJI[category]}</span>
+                  <span className="hidden sm:inline">{category === 'campusEvents' ? 'Events' : category.charAt(0).toUpperCase() + category.slice(1)}</span>
                 </TabsTrigger>
               ))}
             </TabsList>

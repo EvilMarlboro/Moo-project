@@ -100,10 +100,19 @@ export function ProfileSetup() {
     }
   };
 
+  const bgDecorations = (
+    <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
+      <div className="absolute -top-40 -left-32 w-[450px] h-[450px] rounded-full bg-purple-400/18 blur-[90px]" />
+      <div className="absolute -bottom-32 -right-24 w-[480px] h-[480px] rounded-full bg-pink-400/12 blur-[100px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-amber-300/10 blur-[70px]" />
+    </div>
+  );
+
   // Step: choose avatar type
   if (step === 'choose') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+        {bgDecorations}
         <Card className="max-w-md w-full p-8 bg-card border-border">
           <div className="text-center mb-8">
             <h1 className="mb-2">Set Your Profile Picture</h1>
@@ -143,7 +152,8 @@ export function ProfileSetup() {
   // Step: pick emoji avatar
   if (step === 'avatar') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+        {bgDecorations}
         <Card className="max-w-3xl w-full p-8 bg-card border-border">
           <div className="text-center mb-8">
             <h1 className="mb-2">Choose Your Avatar</h1>
@@ -190,7 +200,8 @@ export function ProfileSetup() {
   // Step: upload photo
   if (step === 'upload') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+        {bgDecorations}
         <Card className="max-w-lg w-full p-8 bg-card border-border">
           <div className="text-center mb-8">
             <h1 className="mb-2">Upload Your Photo</h1>
@@ -257,7 +268,8 @@ export function ProfileSetup() {
   const previewAvatarEmoji = typeof previewAvatar === 'object' ? previewAvatar.emoji : undefined;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+      {bgDecorations}
       <Card className="max-w-lg w-full p-8 bg-card border-border">
         <div className="text-center mb-8">
           <div className="mb-4 flex justify-center">

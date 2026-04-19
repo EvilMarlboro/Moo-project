@@ -472,7 +472,13 @@ export function ActivityHub() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen overflow-x-hidden">
+      {/* Background blobs */}
+      <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-40 -left-32 w-[500px] h-[500px] rounded-full bg-purple-400/12 blur-[100px]" />
+        <div className="absolute top-1/3 -right-32 w-96 h-96 rounded-full bg-pink-400/10 blur-[80px]" />
+        <div className="absolute -bottom-32 left-1/4 w-[450px] h-[450px] rounded-full bg-amber-300/10 blur-[100px]" />
+      </div>
       <Navbar />
       <LoginPrompt open={isLoginPromptOpen} onOpenChange={setIsLoginPromptOpen} />
 
@@ -734,6 +740,21 @@ export function ActivityHub() {
 
           {/* Main Content */}
           <div className="flex-1 min-w-0">
+            {/* Greeting banner */}
+            <div className="relative overflow-hidden rounded-2xl mb-6 p-5"
+              style={{ background: 'linear-gradient(135deg, #7C3AED22 0%, #EC489922 50%, #FBBF2422 100%)' }}>
+              <div aria-hidden className="absolute -right-4 -top-4 text-[80px] opacity-10 select-none pointer-events-none rotate-[15deg] leading-none">🐮</div>
+              <div className="flex items-center gap-3">
+                <div className="text-3xl">👋</div>
+                <div>
+                  <p className="font-semibold text-lg leading-tight">
+                    Hey, <span className="text-purple-600">{user?.username}</span>!
+                  </p>
+                  <p className="text-sm text-muted-foreground">Who's online and ready to connect?</p>
+                </div>
+              </div>
+            </div>
+
             {/* Header row */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">

@@ -264,16 +264,42 @@ export function ActivityProfileManager() {
     );
   };
 
+  const CATEGORY_EMOJI: Record<string, string> = { gaming: '🎮', sports: '⚽', studying: '📚', campusEvents: '🎉' };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background overflow-x-hidden">
+      {/* Background blobs */}
+      <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-32 -right-32 w-[420px] h-[420px] rounded-full bg-blue-400/12 blur-[90px]" />
+        <div className="absolute top-1/2 -left-24 w-80 h-80 rounded-full bg-purple-400/10 blur-[70px]" />
+        <div className="absolute -bottom-24 right-1/4 w-[380px] h-[380px] rounded-full bg-green-300/10 blur-[80px]" />
+      </div>
       <Navbar />
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="mb-6">
-          <h1 className="mb-2">Complete Activity Profiles</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1>Complete Activity Profiles</h1>
+          </div>
           <p className="text-muted-foreground">
-            Set up your profile for each activity to start matching ({completedCount}/{selectedActivities.length} completed)
+            Set up your profile for each activity to start matching
           </p>
+          {selectedActivities.length > 0 && (
+            <div className="mt-3 flex items-center gap-3">
+              <div className="flex-1 h-2.5 bg-secondary rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${(completedCount / selectedActivities.length) * 100}%`,
+                    background: 'linear-gradient(90deg, #7C3AED, #EC4899)',
+                  }}
+                />
+              </div>
+              <span className="text-sm font-medium text-primary whitespace-nowrap">
+                {completedCount}/{selectedActivities.length} complete ✨
+              </span>
+            </div>
+          )}
         </div>
 
         {selectedActivities.length === 0 ? (
@@ -295,7 +321,12 @@ export function ActivityProfileManager() {
               const shouldShowForm = isEditing || (!isComplete && activity === firstIncompleteActivity && !editingActivity);
 
               return (
-                <Card key={activity} className="p-6 border-2" style={{ borderColor: color }}>
+                <Card key={activity} className="relative overflow-hidden p-6 border-2" style={{ borderColor: color }}>
+                  <div
+                    className="absolute -right-4 -bottom-4 text-[80px] opacity-[0.06] select-none pointer-events-none rotate-[15deg] leading-none"
+                  >
+                    {CATEGORY_EMOJI[getCategoryForActivity(activity) || ''] || '✨'}
+                  </div>
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-1 h-10 rounded-full" style={{ backgroundColor: color }} />

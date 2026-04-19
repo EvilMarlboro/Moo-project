@@ -147,7 +147,11 @@ export function LoginPage() {
 
   if (signupSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
+          <div className="absolute -top-40 -left-32 w-[480px] h-[480px] rounded-full bg-[#990000]/10 blur-[100px]" />
+          <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full bg-purple-500/12 blur-[100px]" />
+        </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -179,7 +183,22 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+      {/* Background blobs */}
+      <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-40 -left-32 w-[480px] h-[480px] rounded-full bg-[#990000]/10 blur-[100px]" />
+        <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full bg-purple-500/12 blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-pink-300/8 blur-[80px]" />
+      </div>
+      {/* Floating decorative emojis */}
+      <div aria-hidden className="pointer-events-none select-none fixed inset-0 -z-10 overflow-hidden">
+        <span className="absolute top-[12%] left-[8%] text-4xl opacity-20 rotate-[-15deg]">🐮</span>
+        <span className="absolute top-[20%] right-[10%] text-3xl opacity-15 rotate-[10deg]">⚽</span>
+        <span className="absolute bottom-[25%] left-[6%] text-3xl opacity-15 rotate-[-8deg]">🎮</span>
+        <span className="absolute bottom-[18%] right-[8%] text-4xl opacity-15 rotate-[12deg]">📚</span>
+        <span className="absolute top-[60%] right-[5%] text-2xl opacity-10 rotate-[-5deg]">🎉</span>
+        <span className="absolute top-[45%] left-[4%] text-2xl opacity-10 rotate-[8deg]">✨</span>
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
