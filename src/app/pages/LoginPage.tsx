@@ -108,7 +108,7 @@ export function LoginPage() {
         console.log('LOG 4: profile extracted:', profile);
         didNavigate = true;
         console.log('LOG 5: navigating to', profile?.display_name && profile?.avatar ? '/activity-hub' : '/profile-setup');
-        navigate(profile?.display_name && profile?.avatar ? '/activity-hub' : '/profile-setup');
+        navigate(profile && !profile.display_name && !profile.avatar ? '/profile-setup' : '/activity-hub');
       } catch (err) {
         console.log('LOG 6: inner catch fired, error:', err);
         didNavigate = true;
