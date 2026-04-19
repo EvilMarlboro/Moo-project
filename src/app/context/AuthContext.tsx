@@ -35,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const isRefreshingRef = useRef(false);
   const signOutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const establishedUserIdRef = useRef<string | null>(null);
 
   const refreshSession = async () => {
     console.log('[refreshSession] start');
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             vibingMode: profile.vibing_mode || false,
           };
           console.log('[refreshSession] setting full user:', userObj);
+          establishedUserIdRef.current = session.user.id;
           setUser(userObj);
         } else {
           const fallbackUser = {
@@ -83,6 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             activityProfiles: {},
           };
           console.log('[refreshSession] setting fallback user (no profile / timeout):', fallbackUser);
+          establishedUserIdRef.current = session.user.id;
           setUser(fallbackUser);
         }
       } else {
@@ -110,7 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         if (session?.user) {
           // Ignore SIGNED_IN from token refresh if session is already established
-          if (event === 'SIGNED_IN' && supabaseUserId === session.user.id) {
+          if (event === 'SIGNED_IN' && establishedUserIdRef.current === session.user.id) {
             console.log('[onAuthStateChange] SIGNED_IN ignored — session already established for uid:', session.user.id);
             return;
           }
@@ -137,6 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           signOutTimerRef.current = null;
           // Real sign-out (no SIGNED_IN followed) — purge any stale/revoked token from localStorage
           supabase.auth.signOut();
+          establishedUserIdRef.current = null;
           setSupabaseUserId(null);
           setUser(null);
           setLoading(false);
