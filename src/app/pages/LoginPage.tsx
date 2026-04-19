@@ -7,8 +7,11 @@ import { Card } from '../components/ui/card';
 import { Label } from '../components/ui/label';
 import { Shield, Mail, Lock, AlertCircle, CheckCircle, Eye, EyeOff, X, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
+
 export function LoginPage() {
   const navigate = useNavigate();
+  const { refreshSession } = useAuth();
 
   // Auto-redirect logged-in users to activity hub
   useEffect(() => {
@@ -95,11 +98,14 @@ export function LoginPage() {
       }
 
       try {
-        const { data: profile } = await supabase
+        const profileQuery = supabase
           .from('profiles')
           .select('id, display_name, avatar')
           .eq('id', data.user.id)
           .single();
+        const profileTimeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 3000));
+        const result = await Promise.race([profileQuery, profileTimeout]);
+        const profile = result && 'data' in result ? result.data : null;
         didNavigate = true;
         navigate(profile?.display_name && profile?.avatar ? '/activity-hub' : '/profile-setup');
       } catch {
