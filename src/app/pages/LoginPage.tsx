@@ -18,20 +18,15 @@ export function LoginPage() {
     const checkSessionAndProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // Check if user has a complete profile
-        const { data: profile } = await supabase
+        const profileQuery = supabase
           .from('profiles')
           .select('id, display_name, avatar')
           .eq('id', session.user.id)
           .single();
-
-        if (profile && profile.display_name && profile.avatar) {
-          // Returning user - skip setup
-          navigate('/activity-hub', { replace: true });
-        } else {
-          // New user - needs setup
-          navigate('/profile-setup', { replace: true });
-        }
+        const profileTimeout = new Promise<null>(resolve => setTimeout(() => resolve(null), 3000));
+        const result = await Promise.race([profileQuery, profileTimeout]);
+        const profile = result && 'data' in result ? result.data : null;
+        navigate(profile?.display_name && profile?.avatar ? '/activity-hub' : '/profile-setup', { replace: true });
       }
     };
     checkSessionAndProfile();
