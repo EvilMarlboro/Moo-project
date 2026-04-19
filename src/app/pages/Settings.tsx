@@ -20,9 +20,9 @@ export function Settings() {
   const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
-    if (loading) return;
-    if (!user) navigate('/');
-  }, [user, loading, navigate]);
+    if (user === undefined) return;
+    if (user === null) navigate('/');
+  }, [user, navigate]);
 
   // User profile state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
