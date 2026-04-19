@@ -355,10 +355,10 @@ export function ActivityHub() {
         chat_id: chatId,
         rating,
         comment,
-      }, { onConflict: 'reviewer_id,reviewed_id' });
+      }, { onConflict: 'reviewer_id,reviewed_id,chat_id' });
 
     if (error) {
-      toast.error('Failed to save review');
+      toast.error(`Failed to save review: ${error.message}`);
     } else {
       toast.success('Review saved!');
       setExistingReviews(prev => ({ ...prev, [chatId]: { rating, comment } }));
