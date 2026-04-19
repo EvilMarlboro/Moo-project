@@ -64,7 +64,7 @@ export function CategorySelection() {
     <div className="min-h-screen p-4 py-12">
       <div className="container mx-auto max-w-4xl">
         <div className="text-center mb-12">
-          <h1 className="mb-3 text-5xl font-bold text-[#9333EA]" style={{ fontFamily: "'Lotus Bold', sans-serif" }}>
+          <h1 className="mb-3 text-5xl font-bold text-[#9333EA]">
             What brings you here?
           </h1>
           <p className="text-muted-foreground text-lg">
