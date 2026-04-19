@@ -40,8 +40,42 @@ interface ChatItem {
   updated_at: string;
 }
 
+interface RecentMatch {
+  chat_id: string;
+  partner_id: string;
+  partner_username: string;
+  partner_avatar: string;
+  activity: string;
+  created_at: string;
+}
+
 function formatFieldName(field: string): string {
   return field.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+}
+
+function StarRating({
+  rating,
+  onChange,
+  size = 'md',
+}: {
+  rating: number;
+  onChange?: (r: number) => void;
+  size?: 'sm' | 'md';
+}) {
+  return (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map(star => (
+        <button
+          key={star}
+          type="button"
+          onClick={() => onChange?.(star)}
+          className={`leading-none transition-transform ${onChange ? 'cursor-pointer hover:scale-125' : 'cursor-default'} ${size === 'sm' ? 'text-base' : 'text-xl'} ${star <= rating ? 'text-yellow-400' : 'text-muted-foreground/25'}`}
+        >
+          ★
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export function ActivityHub() {
@@ -69,7 +103,15 @@ export function ActivityHub() {
   const [selectedUser, setSelectedUser] = useState<OnlineUser | null>(null);
   const [selectedUserProfile, setSelectedUserProfile] = useState<any>(null);
   const [selectedUserMatchCount, setSelectedUserMatchCount] = useState<number | null>(null);
+  const [selectedUserReviews, setSelectedUserReviews] = useState<any[]>([]);
   const [profileLoading, setProfileLoading] = useState(false);
+
+  // Recent matches + reviews sidebar state
+  const [recentMatches, setRecentMatches] = useState<RecentMatch[]>([]);
+  const [existingReviews, setExistingReviews] = useState<Record<string, { rating: number; comment: string }>>({});
+  const [pendingRatings, setPendingRatings] = useState<Record<string, number>>({});
+  const [pendingComments, setPendingComments] = useState<Record<string, string>>({});
+  const [submittingReview, setSubmittingReview] = useState<Set<string>>(new Set());
 
   const fetchAcceptedConnections = async () => {
     if (!supabaseUserId) return;
@@ -232,6 +274,101 @@ export function ActivityHub() {
 
   useEffect(() => { fetchChats(); }, [supabaseUserId]);
 
+  const fetchRecentMatches = async () => {
+    if (!supabaseUserId) return;
+
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const { data: chatsData } = await supabase
+      .from('chats')
+      .select('id, user1_id, user2_id, activity, created_at')
+      .or(`user1_id.eq.${supabaseUserId},user2_id.eq.${supabaseUserId}`)
+      .gte('created_at', weekAgo.toISOString())
+      .order('created_at', { ascending: false });
+
+    if (!chatsData || chatsData.length === 0) {
+      setRecentMatches([]);
+      return;
+    }
+
+    const chatIds = chatsData.map(c => c.id);
+    const { data: reviewsData } = await supabase
+      .from('reviews')
+      .select('chat_id, rating, comment')
+      .eq('reviewer_id', supabaseUserId)
+      .in('chat_id', chatIds);
+
+    const reviewsMap: Record<string, { rating: number; comment: string }> = {};
+    reviewsData?.forEach(r => {
+      reviewsMap[r.chat_id] = { rating: r.rating, comment: r.comment || '' };
+    });
+    setExistingReviews(reviewsMap);
+
+    const enriched = await Promise.all(
+      chatsData.map(async (chat: any) => {
+        const partnerId = chat.user1_id === supabaseUserId ? chat.user2_id : chat.user1_id;
+        let partnerName = 'USC Student';
+        let partnerAvatar = '👤';
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('display_name, avatar')
+            .eq('id', partnerId)
+            .single();
+          if (profile) {
+            partnerName = profile.display_name || 'USC Student';
+            partnerAvatar = profile.avatar || '👤';
+          }
+        } catch {}
+        return {
+          chat_id: chat.id,
+          partner_id: partnerId,
+          partner_username: partnerName,
+          partner_avatar: partnerAvatar,
+          activity: chat.activity || '',
+          created_at: chat.created_at,
+        };
+      })
+    );
+
+    setRecentMatches(enriched);
+  };
+
+  useEffect(() => {
+    if (!supabaseUserId) return;
+    fetchRecentMatches();
+  }, [supabaseUserId]);
+
+  const handleSubmitReview = async (chatId: string, partnerId: string) => {
+    const rating = pendingRatings[chatId];
+    if (!rating || !supabaseUserId) return;
+
+    setSubmittingReview(prev => new Set(prev).add(chatId));
+    const comment = pendingComments[chatId] || '';
+
+    const { error } = await supabase
+      .from('reviews')
+      .upsert({
+        reviewer_id: supabaseUserId,
+        reviewed_id: partnerId,
+        chat_id: chatId,
+        rating,
+        comment,
+      }, { onConflict: 'reviewer_id,reviewed_id' });
+
+    if (error) {
+      toast.error('Failed to save review');
+    } else {
+      toast.success('Review saved!');
+      setExistingReviews(prev => ({ ...prev, [chatId]: { rating, comment } }));
+      setPendingRatings(prev => { const n = { ...prev }; delete n[chatId]; return n; });
+      setPendingComments(prev => { const n = { ...prev }; delete n[chatId]; return n; });
+    }
+
+    setSubmittingReview(prev => { const n = new Set(prev); n.delete(chatId); return n; });
+  };
+
   const fetchSentRequests = async () => {
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) return;
@@ -320,6 +457,7 @@ export function ActivityHub() {
     setSelectedUser(presenceUser);
     setSelectedUserProfile(null);
     setSelectedUserMatchCount(null);
+    setSelectedUserReviews([]);
     setProfileLoading(true);
 
     // Log view (fire-and-forget, ignore if table doesn't exist yet)
@@ -333,17 +471,35 @@ export function ActivityHub() {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    const [profileResult, matchResult] = await Promise.all([
+    const [profileResult, matchResult, reviewResult] = await Promise.all([
       supabase.from('profiles').select('activity_profiles').eq('id', presenceUser.user_id).single(),
       supabase.from('match_requests')
         .select('id', { count: 'exact', head: true })
         .or(`sender_id.eq.${presenceUser.user_id},receiver_id.eq.${presenceUser.user_id}`)
         .eq('status', 'accepted')
         .gte('created_at', weekAgo.toISOString()),
+      supabase.from('reviews')
+        .select('rating, comment, created_at, reviewer_id')
+        .eq('reviewed_id', presenceUser.user_id)
+        .order('created_at', { ascending: false }),
     ]);
 
     setSelectedUserProfile(profileResult.data?.activity_profiles || {});
     setSelectedUserMatchCount(matchResult.count ?? 0);
+
+    const reviews = reviewResult.data || [];
+    if (reviews.length > 0) {
+      const reviewerIds = reviews.map((r: any) => r.reviewer_id);
+      const { data: nameData } = await supabase
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', reviewerIds);
+      const nameMap = Object.fromEntries((nameData || []).map((p: any) => [p.id, p.display_name || 'USC Student']));
+      setSelectedUserReviews(reviews.map((r: any) => ({ ...r, reviewer_name: nameMap[r.reviewer_id] || 'USC Student' })));
+    } else {
+      setSelectedUserReviews([]);
+    }
+
     setProfileLoading(false);
   };
 
@@ -468,6 +624,11 @@ export function ActivityHub() {
     return groups;
   };
 
+  // Compute average rating for profile modal
+  const avgRating = selectedUserReviews.length > 0
+    ? selectedUserReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / selectedUserReviews.length
+    : null;
+
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       {/* Background blobs */}
@@ -480,7 +641,7 @@ export function ActivityHub() {
       <LoginPrompt open={isLoginPromptOpen} onOpenChange={setIsLoginPromptOpen} />
 
       {/* User profile modal */}
-      <Dialog open={!!selectedUser} onOpenChange={(open) => { if (!open) { setSelectedUser(null); setSelectedUserProfile(null); } }}>
+      <Dialog open={!!selectedUser} onOpenChange={(open) => { if (!open) { setSelectedUser(null); setSelectedUserProfile(null); setSelectedUserReviews([]); } }}>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           {selectedUser && (
             <>
@@ -531,6 +692,42 @@ export function ActivityHub() {
                     {selectedUserMatchCount === null ? '—' : selectedUserMatchCount}
                   </span>
                 </div>
+              </div>
+
+              {/* Reviews section */}
+              <div className="mb-2 px-1">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Reviews</p>
+                  {avgRating !== null && (
+                    <div className="flex items-center gap-1.5">
+                      <StarRating rating={Math.round(avgRating)} size="sm" />
+                      <span className="text-sm font-semibold">{avgRating.toFixed(1)}</span>
+                      <span className="text-xs text-muted-foreground">({selectedUserReviews.length})</span>
+                    </div>
+                  )}
+                </div>
+                {profileLoading ? null : selectedUserReviews.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-2">No reviews yet</p>
+                ) : (
+                  <div className="space-y-2">
+                    {selectedUserReviews.slice(0, 3).map((review: any, i: number) => (
+                      <div key={i} className="p-2.5 rounded-lg bg-secondary/40 border border-border">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium">{review.reviewer_name}</span>
+                          <div className="flex items-center gap-1.5">
+                            <StarRating rating={review.rating} size="sm" />
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(review.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                            </span>
+                          </div>
+                        </div>
+                        {review.comment && (
+                          <p className="text-xs text-muted-foreground italic">"{review.comment}"</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="py-2">
@@ -894,6 +1091,95 @@ export function ActivityHub() {
                 Explore Other Activities
               </Button>
             </div>
+          </div>
+
+          {/* Right Sidebar — Recent Matches */}
+          <div className="w-72 flex-shrink-0">
+            <Card className="p-4 border-2 border-border sticky top-4">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-lg">⭐</span>
+                <h3 className="text-lg">Recent Matches</h3>
+              </div>
+
+              {recentMatches.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6">
+                  No matches in the past 7 days
+                </p>
+              ) : (
+                <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
+                  {recentMatches.map(match => {
+                    const existing = existingReviews[match.chat_id];
+                    const pendingRating = pendingRatings[match.chat_id] ?? 0;
+                    const pendingComment = pendingComments[match.chat_id] ?? '';
+                    const isSubmitting = submittingReview.has(match.chat_id);
+                    const categoryColor = CATEGORY_COLORS[getCategoryForActivity(match.activity) as keyof typeof CATEGORY_COLORS] || '#6B7280';
+
+                    return (
+                      <div key={match.chat_id} className="p-3 rounded-lg border border-border bg-secondary/20 space-y-2">
+                        {/* Partner info */}
+                        <div className="flex items-center gap-2">
+                          <UserAvatar
+                            avatar={match.partner_avatar}
+                            username={match.partner_username}
+                            className="w-9 h-9 border"
+                            fallbackClassName="text-lg"
+                            fallbackStyle={{ backgroundColor: categoryColor + '20' }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{match.partner_username}</p>
+                            <p className="text-xs text-muted-foreground truncate">{match.activity}</p>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(match.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        </p>
+
+                        {existing ? (
+                          /* Already reviewed — read-only */
+                          <div className="space-y-1">
+                            <StarRating rating={existing.rating} size="sm" />
+                            {existing.comment && (
+                              <p className="text-xs text-muted-foreground italic">"{existing.comment}"</p>
+                            )}
+                            <p className="text-xs text-green-600 font-medium">✓ Reviewed</p>
+                          </div>
+                        ) : (
+                          /* Pending review */
+                          <div className="space-y-2">
+                            <StarRating
+                              rating={pendingRating}
+                              size="sm"
+                              onChange={r => setPendingRatings(prev => ({ ...prev, [match.chat_id]: r }))}
+                            />
+                            {pendingRating > 0 && (
+                              <>
+                                <Textarea
+                                  placeholder="Add a comment (optional)"
+                                  value={pendingComment}
+                                  onChange={e => setPendingComments(prev => ({ ...prev, [match.chat_id]: e.target.value }))}
+                                  rows={2}
+                                  maxLength={200}
+                                  className="text-xs resize-none"
+                                />
+                                <Button
+                                  size="sm"
+                                  className="w-full h-7 text-xs"
+                                  disabled={isSubmitting}
+                                  onClick={() => handleSubmitReview(match.chat_id, match.partner_id)}
+                                >
+                                  {isSubmitting ? 'Saving…' : 'Submit Review'}
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
           </div>
         </div>
       </div>
