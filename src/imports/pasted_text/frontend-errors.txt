@@ -1,0 +1,460 @@
+Running frontend commit e13076fc0bca40e477d600c2c69f92d155b161da
+vendor-core-34edd2c749031eb9.min.js.br:54 Statsig is not ready to log exposures, will retry in 1 seconds
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:54Understand this warning
+vendor-core-34edd2c749031eb9.min.js.br:54 Loaded 40 scripts (6468851b), 38 from cache (4546854b)
+(index):1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+vendor-core-34edd2c749031eb9.min.js.br:54 Autosave Changes not available or already claimed by another tab undefined
+vendor-core-34edd2c749031eb9.min.js.br:54 [import] git: e13076fc0bca40e477d600c2c69f92d155b161da, stamp: 7AD68800CAF98504
+7227-4498e261fce395a8.min.js.br:7 The powerPreference option is currently ignored when calling requestAdapter() on Windows. See https://crbug.com/369219127
+initialize @ 7227-4498e261fce395a8.min.js.br:7Understand this warning
+vendor-core-34edd2c749031eb9.min.js.br:54 [Fullscreen] Booting... (emscripten version 4.0.21)
+vendor-core-34edd2c749031eb9.min.js.br:54 [GPU] graphicsAPI:"WebGPU", vendor:"Google Inc. (NVIDIA)" renderer:"ANGLE (NVIDIA, NVIDIA GeForce RTX 3080 (0x00002216) Direct3D11 vs_5_0 ps_5_0, D3D11)" deviceArchitecture:"ampere" deviceDescription:"" webGPUDevice:"" webGPUVendor:"nvidia" bindings:"emdawnwebgpu"
+vendor-core-34edd2c749031eb9.min.js.br:54 [Fullscreen] Ready in 212.7ms
+vendor-core-34edd2c749031eb9.min.js.br:54 [FullscreenApp] calling setEditorTheme and setting preference light
+vendor-core-34edd2c749031eb9.min.js.br:54 [MultiplayerSession] connecting to wss://www.figma.com/api/multiplayer/6eKLK73ojzdZi15vrVVDMR?role=editor&tracking_session_id=vrxi7Sfg4F4X0lyz&version=151&recentReload=0&file-load-streaming-compression=&user-id=1598292806534533515&client_release=e13076fc0bca40e477d600c2c69f92d155b161da&force-dpl-journaled-reconnect=1
+vendor-core-34edd2c749031eb9.min.js.br:54 [MultiplayerSession] Joining file version 106 (initial load)
+vendor-core-34edd2c749031eb9.min.js.br:54 [FullscreenApp] calling setEditorTheme and setting preference light
+/api/folders/457212775:1  Failed to load resource: the server responded with a status of 403 ()Understand this error
+vendor-core-34edd2c749031eb9.min.js.br:54 [Sprigma] Sprig SDK is ready
+vendor-core-34edd2c749031eb9.min.js.br:54 [Fullscreen] loadtime=2.81s maxmem=18466544
+752-bc83be17348c3e1a.min.js.br:1403 Uncaught (in promise) T: XHR for "/api/folders/457212775" failed with status 403
+    at N (752-bc83be17348c3e1a.min.js.br:1403:13521)
+    at async Object.R [as get] (752-bc83be17348c3e1a.min.js.br:1403:13904)
+    at async 752-bc83be17348c3e1a.min.js.br:1098:164098
+    at async _.validate (figma_app-9f8eb162043ab5d7.min.js.br:201:189703)
+    at async h.fetchObject (752-bc83be17348c3e1a.min.js.br:349:151115)
+    at async f (752-bc83be17348c3e1a.min.js.br:349:131421)Understand this error
+2vendor-core-34edd2c749031eb9.min.js.br:54 [devtools] Initialized LS
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/functions/v1/make-server-5eb2b086/profile/9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/functions/v1/make-server-5eb2b086/profile/9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/functions/v1/make-server-5eb2b086/profile/9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/functions/v1/make-server-5eb2b086/profile/9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/functions/v1/make-server-5eb2b086/profile/9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/functions/v1/make-server-5eb2b086/profile/9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/functions/v1/make-server-5eb2b086/profile/9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/functions/v1/make-server-5eb2b086/profile/9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+vendor-core-34edd2c749031eb9.min.js.br:54 [MultiplayerSession] connecting to wss://www.figma.com/api/multiplayer/6eKLK73ojzdZi15vrVVDMR?role=editor&tracking_session_id=vrxi7Sfg4F4X0lyz&version=151&recentReload=0&file-load-streaming-compression=&user-id=1598292806534533515&client_release=e13076fc0bca40e477d600c2c69f92d155b161da&reconnect-key=d4ce95dfc0ca224b303e35195cf0891948c8a23b&reconnect-sequence-number=2235&initialFileVersion=106&previousLoadMode=full&incremental-loading-validation=0&force-dpl-journaled-reconnect=1
+vendor-core-34edd2c749031eb9.min.js.br:54 [MultiplayerSession] Joining file version 106 (skip_reload reconnect)
+vendor-core-34edd2c749031eb9.min.js.br:54 [MultiplayerSession] connecting to wss://www.figma.com/api/multiplayer/6eKLK73ojzdZi15vrVVDMR?role=editor&tracking_session_id=vrxi7Sfg4F4X0lyz&version=151&recentReload=0&file-load-streaming-compression=&user-id=1598292806534533515&client_release=e13076fc0bca40e477d600c2c69f92d155b161da&reconnect-key=d4ce95dfc0ca224b303e35195cf0891948c8a23b&reconnect-sequence-number=2235&initialFileVersion=106&previousLoadMode=full&incremental-loading-validation=0&force-dpl-journaled-reconnect=1
+vendor-core-34edd2c749031eb9.min.js.br:54 [MultiplayerSession] Joining file version 106 (journaled reconnect)
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+(index):1 Access to script at 'https://ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/@react-refresh' from origin 'https://44b3be6c-46b5-42f2-9ea4-3694519b9feb-v3-figmaiframepreview.figma.site' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+(index):1 Access to script at 'https://ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/@react-refresh' from origin 'https://44b3be6c-46b5-42f2-9ea4-3694519b9feb-v3-figmaiframepreview.figma.site' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+@react-refresh:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+@react-refresh:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+(index):1 Access to script at 'https://ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/@react-refresh' from origin 'https://44b3be6c-46b5-42f2-9ea4-3694519b9feb-v3-figmaiframepreview.figma.site' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+(index):1 Access to script at 'https://ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/@react-refresh' from origin 'https://44b3be6c-46b5-42f2-9ea4-3694519b9feb-v3-figmaiframepreview.figma.site' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+@react-refresh:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+@react-refresh:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+Layout.tsx:1  Failed to load resource: net::ERR_EMPTY_RESPONSEUnderstand this error
+ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/src/app/components/Layout.tsx:1  Failed to load resource: net::ERR_EMPTY_RESPONSEUnderstand this error
+LandingPage.tsx:1  Failed to load resource: net::ERR_SOCKET_NOT_CONNECTEDUnderstand this error
+ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/src/app/pages/LandingPage.tsx:1  Failed to load resource: net::ERR_SOCKET_NOT_CONNECTEDUnderstand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%2Cuser2_id.eq.b7f912eb-5a45-4d30-bf05-55f519736548%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+vendor-core-34edd2c749031eb9.min.js.br:54 Too many elapsed hits of react since last report
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:54Understand this warning
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&or=%28user1_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%2Cuser2_id.eq.ef0c85d5-70a2-4a33-8dad-98feffc6486b%29&order=updated_at.desc:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&id=eq.9d6dcc6c-3dd7-4df9-849e-22c432d90213:1  Failed to load resource: the server responded with a status of 406 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&id=eq.9d6dcc6c-3dd7-4df9-849e-22c432d90213:1  Failed to load resource: the server responded with a status of 406 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&id=eq.9d6dcc6c-3dd7-4df9-849e-22c432d90213:1  Failed to load resource: the server responded with a status of 406 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&id=eq.9d6dcc6c-3dd7-4df9-849e-22c432d90213:1  Failed to load resource: the server responded with a status of 406 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Fetching profile for partner ID: 9e3414ce-783a-4c79-9831-5ef5d49a1780
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile query result: Object
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Final partner data: Object
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&id=eq.9d6dcc6c-3dd7-4df9-849e-22c432d90213:1  Failed to load resource: the server responded with a status of 406 ()Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&id=eq.9d6dcc6c-3dd7-4df9-849e-22c432d90213:1  Failed to load resource: the server responded with a status of 406 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Error loading chat: Object
+lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 1:49:14 AM [vite] (client) hmr update /src/app/pages/Chat.tsx, /src/styles/index.css
+vendor-core-34edd2c749031eb9.min.js.br:63  GET https://www.figma.com/api/integrations/github-app/plans/team/1552087477582448659/github-installations/admin/repository?plan_type=team&plan_parent_id=1552087477582448659&file_key=6eKLK73ojzdZi15vrVVDMR 403 (Forbidden)
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:63
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:1403
+k @ 752-bc83be17348c3e1a.min.js.br:1403
+await in k
+N @ 752-bc83be17348c3e1a.min.js.br:1403
+R @ 752-bc83be17348c3e1a.min.js.br:1403
+(anonymous) @ figma_app-9f8eb162043ab5d7.min.js.br:192
+validate @ figma_app-9f8eb162043ab5d7.min.js.br:201
+getMakeGithubRepositoryMapping @ figma_app-9f8eb162043ab5d7.min.js.br:192
+fetch @ figma_app-9f8eb162043ab5d7.min.js.br:436
+p @ 752-bc83be17348c3e1a.min.js.br:349
+await in p
+d @ vendor-4c098d52d22bab16.min.js.br:296
+_ @ vendor-4c098d52d22bab16.min.js.br:296
+h @ vendor-4c098d52d22bab16.min.js.br:296
+fetch @ vendor-4c098d52d22bab16.min.js.br:296
+executeFetch @ vendor-4c098d52d22bab16.min.js.br:296
+onSubscribe @ vendor-4c098d52d22bab16.min.js.br:296
+subscribe @ vendor-4c098d52d22bab16.min.js.br:296
+subscribe @ 752-bc83be17348c3e1a.min.js.br:349
+_ @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+t @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+t @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:349
+t @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:1644
+t @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:349
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:349
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:1644
+t @ vendor-core-34edd2c749031eb9.min.js.br:68
+get @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:2007
+useReducer @ vendor-core-34edd2c749031eb9.min.js.br:11
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:46
+p @ 752-bc83be17348c3e1a.min.js.br:2007
+m @ 752-bc83be17348c3e1a.min.js.br:2007
+g @ 752-bc83be17348c3e1a.min.js.br:1364
+P @ figma_app-9f8eb162043ab5d7.min.js.br:436
+j @ figma_app-9f8eb162043ab5d7.min.js.br:436
+en @ figma_app-9f8eb162043ab5d7.min.js.br:436
+rp @ vendor-core-34edd2c749031eb9.min.js.br:11
+u @ vendor-core-34edd2c749031eb9.min.js.br:11
+oH @ vendor-core-34edd2c749031eb9.min.js.br:11
+oI @ vendor-core-34edd2c749031eb9.min.js.br:11
+oP @ vendor-core-34edd2c749031eb9.min.js.br:11
+t5 @ vendor-core-34edd2c749031eb9.min.js.br:11
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:11Understand this error
+vendor-core-34edd2c749031eb9.min.js.br:63  GET https://www.figma.com/api/integrations/github-app/figma-make/6eKLK73ojzdZi15vrVVDMR/installations 403 (Forbidden)
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:63
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:1403
+k @ 752-bc83be17348c3e1a.min.js.br:1403
+await in k
+N @ 752-bc83be17348c3e1a.min.js.br:1403
+R @ 752-bc83be17348c3e1a.min.js.br:1403
+(anonymous) @ figma_app-9f8eb162043ab5d7.min.js.br:192
+validate @ figma_app-9f8eb162043ab5d7.min.js.br:201
+getGithubInstallationsMakeFile @ figma_app-9f8eb162043ab5d7.min.js.br:192
+fetch @ figma_app-9f8eb162043ab5d7.min.js.br:436
+p @ 752-bc83be17348c3e1a.min.js.br:349
+await in p
+d @ vendor-4c098d52d22bab16.min.js.br:296
+_ @ vendor-4c098d52d22bab16.min.js.br:296
+h @ vendor-4c098d52d22bab16.min.js.br:296
+fetch @ vendor-4c098d52d22bab16.min.js.br:296
+executeFetch @ vendor-4c098d52d22bab16.min.js.br:296
+onSubscribe @ vendor-4c098d52d22bab16.min.js.br:296
+subscribe @ vendor-4c098d52d22bab16.min.js.br:296
+subscribe @ 752-bc83be17348c3e1a.min.js.br:349
+_ @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+t @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+t @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:349
+t @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:1644
+t @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:349
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:349
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:1644
+t @ vendor-core-34edd2c749031eb9.min.js.br:68
+get @ vendor-core-34edd2c749031eb9.min.js.br:68
+(anonymous) @ 752-bc83be17348c3e1a.min.js.br:2007
+useReducer @ vendor-core-34edd2c749031eb9.min.js.br:11
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:46
+p @ 752-bc83be17348c3e1a.min.js.br:2007
+m @ 752-bc83be17348c3e1a.min.js.br:2007
+g @ 752-bc83be17348c3e1a.min.js.br:1364
+M @ figma_app-9f8eb162043ab5d7.min.js.br:436
+en @ figma_app-9f8eb162043ab5d7.min.js.br:436
+rp @ vendor-core-34edd2c749031eb9.min.js.br:11
+u @ vendor-core-34edd2c749031eb9.min.js.br:11
+oH @ vendor-core-34edd2c749031eb9.min.js.br:11
+oI @ vendor-core-34edd2c749031eb9.min.js.br:11
+oP @ vendor-core-34edd2c749031eb9.min.js.br:11
+t5 @ vendor-core-34edd2c749031eb9.min.js.br:11
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:11Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Fetching profile for partner ID: 9e3414ce-783a-4c79-9831-5ef5d49a1780
+@supabase_supabase-js.js?v=491b7151:19452  GET https://pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780 400 (Bad Request)
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19452
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19466
+await in (anonymous)
+executeWithRetry @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:559
+then @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:588Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile query result: {profile: null, profileError: {…}}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile not found, checking match_requests for email...
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Match request fallback: {sender_email: null, receiver_id: 'ef0c85d5-70a2-4a33-8dad-98feffc6486b', sender_id: '9e3414ce-783a-4c79-9831-5ef5d49a1780'}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Final partner data: {partnerName: 'USC Student', partnerAvatar: '👤', partnerGender: undefined}
+@supabase_supabase-js.js?v=491b7151:19452  GET https://pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&id=eq.9d6dcc6c-3dd7-4df9-849e-22c432d90213 406 (Not Acceptable)
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19452
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19466
+await in (anonymous)
+executeWithRetry @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:559
+then @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:588
+postMessage
+t @ code_components_preview_iframe-532c60497e9b752b.min.js.br:61
+eo @ code_components_preview_iframe-532c60497e9b752b.min.js.br:61
+postMessage
+t @ code_components_preview_iframe-532c60497e9b752b.min.js.br:61
+el @ code_components_preview_iframe-532c60497e9b752b.min.js.br:61
+z @ code_components_preview_iframe-532c60497e9b752b.min.js.br:61
+t.exports.unstable_scheduleCallback @ code_components_preview_iframe-532c60497e9b752b.min.js.br:65
+Ip @ code_components_preview_iframe-532c60497e9b752b.min.js.br:37
+Sy @ code_components_preview_iframe-532c60497e9b752b.min.js.br:37
+SE @ code_components_preview_iframe-532c60497e9b752b.min.js.br:37
+m9 @ code_components_preview_iframe-532c60497e9b752b.min.js.br:37
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:6816
+tM @ code_components_preview_iframe-532c60497e9b752b.min.js.br:53
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:6812
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:2005
+updateState @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:2004
+completeNavigation @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:2081
+handleLoaders @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:2560
+startNavigation @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:2314
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:1938
+handlePop @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:713
+navigateToUrl @ code_components_preview_iframe-532c60497e9b752b.min.js.br:588
+navigateToUrl @ code_components_preview_iframe-532c60497e9b752b.min.js.br:1000
+o @ code_components_preview_iframe-532c60497e9b752b.min.js.br:65
+t.onmessage @ code_components_preview_iframe-532c60497e9b752b.min.js.br:65
+postMessage
+s @ 752-bc83be17348c3e1a.min.js.br:1231
+trackMessage @ 752-bc83be17348c3e1a.min.js.br:1231
+sendMessage @ 752-bc83be17348c3e1a.min.js.br:1231
+sendMessage @ figma_app-9f8eb162043ab5d7.min.js.br:436
+B @ 311-389ccf51b0caf6d5.min.js.br:55
+onSelect @ 311-389ccf51b0caf6d5.min.js.br:55
+A.eventName @ figma_app-9f8eb162043ab5d7.min.js.br:446
+ez @ vendor-core-34edd2c749031eb9.min.js.br:11
+eq @ vendor-core-34edd2c749031eb9.min.js.br:11
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:11
+ti @ vendor-core-34edd2c749031eb9.min.js.br:11
+tt @ vendor-core-34edd2c749031eb9.min.js.br:11
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:11
+oL @ vendor-core-34edd2c749031eb9.min.js.br:11
+eR @ vendor-core-34edd2c749031eb9.min.js.br:11
+tl @ vendor-core-34edd2c749031eb9.min.js.br:11
+nz @ vendor-core-34edd2c749031eb9.min.js.br:11
+nI @ vendor-core-34edd2c749031eb9.min.js.br:11
+u @ vendor-core-34edd2c749031eb9.min.js.br:54Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&id=eq.9d6dcc6c-3dd7-4df9-849e-22c432d90213:1  Failed to load resource: the server responded with a status of 406 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Error loading chat: {code: 'PGRST116', details: 'The result contains 0 rows', hint: null, message: 'Cannot coerce the result to a single JSON object'}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Fetching profile for partner ID: 9e3414ce-783a-4c79-9831-5ef5d49a1780
+@supabase_supabase-js.js?v=491b7151:19452  GET https://pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780 400 (Bad Request)
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19452
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19466
+await in (anonymous)
+executeWithRetry @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:559
+then @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:588Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile query result: {profile: null, profileError: {…}}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile not found, checking match_requests for email...
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Match request fallback: {sender_email: null, receiver_id: 'ef0c85d5-70a2-4a33-8dad-98feffc6486b', sender_id: '9e3414ce-783a-4c79-9831-5ef5d49a1780'}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Final partner data: {partnerName: 'USC Student', partnerAvatar: '👤', partnerGender: undefined}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Fetching profile for partner ID: 9e3414ce-783a-4c79-9831-5ef5d49a1780
+@supabase_supabase-js.js?v=491b7151:19452  GET https://pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780 400 (Bad Request)
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19452
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19466
+await in (anonymous)
+executeWithRetry @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:559
+then @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:588Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile query result: {profile: null, profileError: {…}}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile not found, checking match_requests for email...
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Match request fallback: {sender_email: null, receiver_id: '9e3414ce-783a-4c79-9831-5ef5d49a1780', sender_id: 'b7f912eb-5a45-4d30-bf05-55f519736548'}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Final partner data: {partnerName: 'USC Student', partnerAvatar: '👤', partnerGender: undefined}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Fetching profile for partner ID: 9e3414ce-783a-4c79-9831-5ef5d49a1780
+@supabase_supabase-js.js?v=491b7151:19452  GET https://pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780 400 (Bad Request)
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19452
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19466
+await in (anonymous)
+executeWithRetry @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:559
+then @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:588Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile query result: {profile: null, profileError: {…}}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile not found, checking match_requests for email...
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Match request fallback: {sender_email: null, receiver_id: '9e3414ce-783a-4c79-9831-5ef5d49a1780', sender_id: 'b7f912eb-5a45-4d30-bf05-55f519736548'}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Final partner data: {partnerName: 'USC Student', partnerAvatar: '👤', partnerGender: undefined}
+@supabase_supabase-js.js?v=491b7151:19452  GET https://pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&id=eq.ebc54c3f-29cf-4170-9bed-456e571b92cd 406 (Not Acceptable)
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19452
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19466
+await in (anonymous)
+executeWithRetry @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:559
+then @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:588
+postMessage
+t @ code_components_preview_iframe-532c60497e9b752b.min.js.br:61
+el @ code_components_preview_iframe-532c60497e9b752b.min.js.br:61
+z @ code_components_preview_iframe-532c60497e9b752b.min.js.br:61
+t.exports.unstable_scheduleCallback @ code_components_preview_iframe-532c60497e9b752b.min.js.br:65
+Ip @ code_components_preview_iframe-532c60497e9b752b.min.js.br:37
+Sy @ code_components_preview_iframe-532c60497e9b752b.min.js.br:37
+SE @ code_components_preview_iframe-532c60497e9b752b.min.js.br:37
+m9 @ code_components_preview_iframe-532c60497e9b752b.min.js.br:37
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:6816
+tM @ code_components_preview_iframe-532c60497e9b752b.min.js.br:53
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:6812
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:2005
+updateState @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:2004
+completeNavigation @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:2081
+handleLoaders @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:2560
+startNavigation @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:2314
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:1938
+handlePop @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/react-router.js?v=3d595095:713
+navigateToUrl @ code_components_preview_iframe-532c60497e9b752b.min.js.br:588
+navigateToUrl @ code_components_preview_iframe-532c60497e9b752b.min.js.br:1000
+o @ code_components_preview_iframe-532c60497e9b752b.min.js.br:65
+t.onmessage @ code_components_preview_iframe-532c60497e9b752b.min.js.br:65
+postMessage
+s @ 752-bc83be17348c3e1a.min.js.br:1231
+trackMessage @ 752-bc83be17348c3e1a.min.js.br:1231
+sendMessage @ 752-bc83be17348c3e1a.min.js.br:1231
+sendMessage @ figma_app-9f8eb162043ab5d7.min.js.br:436
+B @ 311-389ccf51b0caf6d5.min.js.br:55
+onSelect @ 311-389ccf51b0caf6d5.min.js.br:55
+A.eventName @ figma_app-9f8eb162043ab5d7.min.js.br:446
+ez @ vendor-core-34edd2c749031eb9.min.js.br:11
+eq @ vendor-core-34edd2c749031eb9.min.js.br:11
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:11
+ti @ vendor-core-34edd2c749031eb9.min.js.br:11
+tt @ vendor-core-34edd2c749031eb9.min.js.br:11
+(anonymous) @ vendor-core-34edd2c749031eb9.min.js.br:11
+oL @ vendor-core-34edd2c749031eb9.min.js.br:11
+eR @ vendor-core-34edd2c749031eb9.min.js.br:11
+tl @ vendor-core-34edd2c749031eb9.min.js.br:11
+nz @ vendor-core-34edd2c749031eb9.min.js.br:11
+nI @ vendor-core-34edd2c749031eb9.min.js.br:11
+u @ vendor-core-34edd2c749031eb9.min.js.br:54Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/chats?select=*&id=eq.ebc54c3f-29cf-4170-9bed-456e571b92cd:1  Failed to load resource: the server responded with a status of 406 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Error loading chat: {code: 'PGRST116', details: 'The result contains 0 rows', hint: null, message: 'Cannot coerce the result to a single JSON object'}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Fetching profile for partner ID: 9e3414ce-783a-4c79-9831-5ef5d49a1780
+@supabase_supabase-js.js?v=491b7151:19452  GET https://pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780 400 (Bad Request)
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19452
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19466
+await in (anonymous)
+executeWithRetry @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:559
+then @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:588Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile query result: {profile: null, profileError: {…}}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile not found, checking match_requests for email...
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Match request fallback: {sender_email: null, receiver_id: '9e3414ce-783a-4c79-9831-5ef5d49a1780', sender_id: 'b7f912eb-5a45-4d30-bf05-55f519736548'}
+vendor-core-34edd2c749031eb9.min.js.br:54 [Livegraph] Connection closed. Code: 4001, reason: draining_start
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Final partner data: {partnerName: 'USC Student', partnerAvatar: '👤', partnerGender: undefined}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 1:55:50 AM [vite] (client) hmr update /src/app/pages/Chat.tsx, /src/styles/index.css
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Fetching profile for partner ID: 9e3414ce-783a-4c79-9831-5ef5d49a1780
+@supabase_supabase-js.js?v=491b7151:19452  GET https://pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780 400 (Bad Request)
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19452
+(anonymous) @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:19466
+await in (anonymous)
+executeWithRetry @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:559
+then @ ta-01kp9x1ednvdcse8xpemq3byzd-1380-46evodvm1rxdwp5d1k455fh8t.makeproxy-m.figma.site/node_modules/.vite/deps/@supabase_supabase-js.js?v=491b7151:588Understand this error
+pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile query result: {profile: null, profileError: {…}}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile not found, checking match_requests for email...
+about:client:3  GET https://fonts.cdnfonts.com/css/lotus-bold net::ERR_ABORTED 500 (Internal Server Error)Understand this error
+fonts.cdnfonts.com/css/lotus-bold:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Match request (partner as sender): {sender_email: null, receiver_id: 'ef0c85d5-70a2-4a33-8dad-98feffc6486b', sender_id: '9e3414ce-783a-4c79-9831-5ef5d49a1780'}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 All matches between users: (2) [{…}, {…}]
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Final partner data: {partnerName: 'USC Student', partnerAvatar: '👤', partnerGender: undefined}
+about:client:3  GET https://fonts.cdnfonts.com/css/lotus-bold net::ERR_ABORTED 500 (Internal Server Error)Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Fetching profile for partner ID: 9e3414ce-783a-4c79-9831-5ef5d49a1780
+@supabase_supabase-js.js?v=491b7151:19452  GET https://pmrbowwampenlgucwhsg.supabase.co/rest/v1/profiles?select=display_name%2Cavatar%2Cgender%2Cenabled_activities%2Cactivity_profiles&id=eq.9e3414ce-783a-4c79-9831-5ef5d49a1780 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=491b7151:19452
+(anonymous) @ @supabase_supabase-js.js?v=491b7151:19466
+await in (anonymous)
+executeWithRetry @ @supabase_supabase-js.js?v=491b7151:559
+then @ @supabase_supabase-js.js?v=491b7151:588Understand this error
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile query result: {profile: null, profileError: {…}}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Profile not found, checking match_requests for email...
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Match request (partner as sender): {sender_email: null, receiver_id: 'ef0c85d5-70a2-4a33-8dad-98feffc6486b', sender_id: '9e3414ce-783a-4c79-9831-5ef5d49a1780'}
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 All matches between users: (2) [{…}, {…}]
+code_components_preview_iframe-532c60497e9b752b.min.js.br:106 Final partner data: 
