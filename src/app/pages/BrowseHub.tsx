@@ -113,7 +113,7 @@ export function BrowseHub() {
 
   return (
     <motion.div
-      className="min-h-screen bg-background"
+      className="min-h-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeIn' }}
@@ -148,7 +148,7 @@ export function BrowseHub() {
             <Button
               onClick={() => navigate('/login')}
               size="lg"
-              className="bg-[#990000] hover:bg-[#7a0000] text-white px-12"
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-semibold px-12 shadow-lg shadow-amber-500/20"
             >
               Sign In with USC to Connect
             </Button>
@@ -158,7 +158,7 @@ export function BrowseHub() {
         {/* Category Tabs */}
         <Tabs value={activeCategory} onValueChange={(v) => setActiveCategory(v as Category)}>
           <div className="flex justify-center mb-6">
-            <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+            <TabsList className="grid grid-cols-4 w-full max-w-2xl border border-white/10 bg-white/5 backdrop-blur-xl">
               {allCategories.map((category) => (
                 <TabsTrigger
                   key={category}
@@ -229,7 +229,7 @@ export function BrowseHub() {
                               transition={{ duration: 0.3, delay: index * 0.05 }}
                             >
                               <Card
-                                className="p-4 bg-gradient-to-br from-white to-purple-50 border-2 hover:scale-[1.02] transition-all hover:shadow-xl"
+                                className="p-4 border hover:scale-[1.02] transition-all hover:shadow-2xl hover:shadow-black/50"
                                 style={{
                                   borderColor: categoryColor,
                                   boxShadow: `0 4px 20px ${categoryColor}20`,
@@ -418,7 +418,7 @@ export function BrowseHub() {
                         {!user && (
                           <Button
                             onClick={() => navigate('/login')}
-                            className="bg-[#990000] hover:bg-[#7a0000] text-white"
+                            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-semibold shadow-lg shadow-amber-500/20"
                           >
                             <UserPlus className="h-4 w-4 mr-2" />
                             Sign In with USC to Connect

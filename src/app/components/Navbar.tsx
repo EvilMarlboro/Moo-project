@@ -8,12 +8,12 @@ export function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b-2 border-purple-200 shadow-md">
+    <nav className="sticky top-0 z-50 bg-white/5 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/30">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to={user ? "/activity-hub" : "/browse-hub"} className="flex items-center gap-2">
-            <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+            <div className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
               MOO 🐮
             </div>
           </Link>
@@ -75,7 +75,7 @@ export function Navbar() {
                 <Button
                   onClick={() => navigate('/login')}
                   size="sm"
-                  className="bg-[#990000] hover:bg-[#7a0000] text-white ml-2"
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-semibold ml-2 shadow-lg shadow-amber-500/20"
                 >
                   <Shield className="h-4 w-4 mr-2" />
                   Sign In
