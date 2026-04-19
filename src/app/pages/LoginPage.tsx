@@ -79,7 +79,7 @@ export function LoginPage() {
         return;
       }
 
-      navigate('/activity-hub');
+      navigate('/activity-hub', { replace: true });
     } catch (err) {
       setError('Sign in failed. Please try again.');
     } finally {
