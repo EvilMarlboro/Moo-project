@@ -493,6 +493,8 @@ export function ActivityHub() {
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) return;
 
+    console.log('[handleConnect] supabaseUserId:', supabaseUserId, '| authUser.id:', authUser.id);
+
     const { data: existing } = await supabase
       .from('match_requests')
       .select('id, status')
@@ -507,16 +509,20 @@ export function ActivityHub() {
       return;
     }
 
+    const insertPayload = {
+      sender_id: authUser.id,
+      receiver_id: presenceUser.user_id,
+      activity: presenceUser.activities?.[0] || 'General',
+      status: 'pending',
+      sender_email: authUser.email,
+    };
+    console.log('[handleConnect] inserting:', insertPayload);
+
     const { error } = await supabase
       .from('match_requests')
-      .insert({
-        sender_id: authUser.id,
-        receiver_id: presenceUser.user_id,
-        activity: presenceUser.activities?.[0] || 'General',
-        status: 'pending',
-        sender_email: authUser.email,
-      });
+      .insert(insertPayload);
     if (error) {
+      console.error('[handleConnect] insert error:', error);
       toast.error('Error: ' + error.message);
     } else {
       setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
