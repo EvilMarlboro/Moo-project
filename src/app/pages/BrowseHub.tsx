@@ -4,7 +4,6 @@ import { Navbar } from '../components/Navbar';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Users, Shield, MessageCircle, UserPlus } from 'lucide-react';
 import { CATEGORY_COLORS } from '../data/mockData';
@@ -222,17 +221,13 @@ export function BrowseHub() {
                                 <div className="flex items-start gap-4">
                                   {/* Avatar */}
                                   <div className="relative">
-                                    <Avatar
+                                    <UserAvatar
+                                      avatar={presenceUser.avatar || '👤'}
+                                      username={presenceUser.username}
                                       className="w-16 h-16 border-2"
-                                      style={{ borderColor: categoryColor }}
-                                    >
-                                      <AvatarFallback
-                                        className="text-3xl"
-                                        style={{ backgroundColor: categoryColor + '20' }}
-                                      >
-                                        {presenceUser.avatar || '👤'}
-                                      </AvatarFallback>
-                                    </Avatar>
+                                      fallbackClassName="text-3xl"
+                                      fallbackStyle={{ backgroundColor: categoryColor + '20', borderColor: categoryColor }}
+                                    />
                                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-card" />
                                   </div>
 

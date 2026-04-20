@@ -5,7 +5,6 @@ import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
-import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { UserAvatar } from '../components/UserAvatar';
 import { Send, ArrowLeft, Flag, AlertCircle, Shield, Gamepad2, UserX, MoreVertical, User } from 'lucide-react';
 import { CATEGORY_COLORS } from '../data/mockData';
@@ -344,11 +343,13 @@ export function Chat() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <Avatar className="w-14 h-14 border-2" style={{ borderColor: categoryColor }}>
-                      <AvatarFallback className="text-2xl" style={{ backgroundColor: categoryColor + '20' }}>
-                        {partner.avatar}
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar
+                      avatar={partner.avatar}
+                      username={partner.username}
+                      className="w-14 h-14 border-2"
+                      fallbackClassName="text-2xl"
+                      fallbackStyle={{ backgroundColor: categoryColor + '20', borderColor: categoryColor }}
+                    />
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card" />
                   </div>
 

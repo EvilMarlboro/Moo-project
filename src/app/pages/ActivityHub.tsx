@@ -14,7 +14,6 @@ import { useNavigate } from 'react-router';
 import { getCategoryForActivity, getRequiredFieldsForActivity } from '../data/activityHelpers';
 import { useMatches } from '../context/MatchContext';
 import { Card } from '../components/ui/card';
-import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { UserAvatar } from '../components/UserAvatar';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
