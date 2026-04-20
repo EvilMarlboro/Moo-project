@@ -46,6 +46,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Deduplicate presence state by user_id, keeping the most recent entry per user.
+function dedupePresence(channel: { presenceState(): Record<string, unknown[]> }): OnlineUser[] {
+  const flat = Object.values(channel.presenceState()).flat() as unknown as OnlineUser[];
+  const map = new Map<string, OnlineUser>();
+  flat.forEach(u => {
+    if (!u.user_id) return;
+    const existing = map.get(u.user_id);
+    if (!existing || u.online_at > existing.online_at) map.set(u.user_id, u);
+  });
+  return Array.from(map.values());
+}
+
 // Pure helper — defined outside the component so it's stable
 function buildPresencePayload(u: User, uid: string) {
   const categories = Array.from(new Set(
@@ -76,6 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const establishedUserIdRef = useRef<string | null>(null);
   const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const presenceDataRef = useRef<Record<string, any> | null>(null);
+  const lastTrackedPayloadRef = useRef<string | null>(null);
 
   const refreshSession = async () => {
     try {
@@ -250,19 +263,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const channel = supabase
       .channel('global-online-users')
       .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const users = Object.values(state).flat() as unknown as OnlineUser[];
-        setOnlineUsers(users);
+        setOnlineUsers(dedupePresence(channel));
       })
       .on('presence', { event: 'join' }, () => {
-        const state = channel.presenceState();
-        const users = Object.values(state).flat() as unknown as OnlineUser[];
-        setOnlineUsers(users);
+        setOnlineUsers(dedupePresence(channel));
       })
       .on('presence', { event: 'leave' }, () => {
-        const state = channel.presenceState();
-        const users = Object.values(state).flat() as unknown as OnlineUser[];
-        setOnlineUsers(users);
+        setOnlineUsers(dedupePresence(channel));
       })
       .subscribe((status: string) => {
         if (status === 'SUBSCRIBED') {
@@ -311,17 +318,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       supabase.removeChannel(channel);
       presenceChannelRef.current = null;
       presenceDataRef.current = null;
+      lastTrackedPayloadRef.current = null;
       setOnlineUsers([]);
     };
   }, [supabaseUserId]);
 
   // ── Re-track whenever the user's profile fields change ──────────────────────
   // Skips incomplete profiles (no username) so they don't appear in the hub.
+  // Guards against redundant track() calls by comparing a stable payload hash
+  // (excluding online_at which changes every call).
   useEffect(() => {
     if (!user || !supabaseUserId || !user.username) return;
     const payload = buildPresencePayload(user, supabaseUserId);
+    const { online_at: _oa, ...stable } = payload;
+    const hash = JSON.stringify(stable);
+    if (lastTrackedPayloadRef.current === hash) return;
+    lastTrackedPayloadRef.current = hash;
     presenceDataRef.current = payload;
-    // .track() is safe to call on an already-subscribed channel at any time.
     if (presenceChannelRef.current) {
       presenceChannelRef.current.track(payload).catch(() => {});
     }
