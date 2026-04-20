@@ -210,7 +210,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Created on login, destroyed on logout. Never torn down on page navigation.
   useEffect(() => {
     if (!supabaseUserId) {
-      // Logged out — leave presence and clean up
       if (presenceChannelRef.current) {
         presenceChannelRef.current.untrack().catch(() => {});
         supabase.removeChannel(presenceChannelRef.current);
@@ -220,29 +219,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const channel = supabase.channel('global-online-users');
-    presenceChannelRef.current = channel;
+    // Guard: remove any stale channel before creating a new one so we never
+    // end up with two subscriptions to the same channel name.
+    if (presenceChannelRef.current) {
+      presenceChannelRef.current.untrack().catch(() => {});
+      supabase.removeChannel(presenceChannelRef.current);
+      presenceChannelRef.current = null;
+    }
 
-    channel.subscribe((status: string) => {
-      // On subscribe (or reconnect after CHANNEL_ERROR), push current data
-      if (status === 'SUBSCRIBED' && presenceDataRef.current) {
-        channel.track({ ...presenceDataRef.current, online_at: new Date().toISOString() }).catch(() => {});
-      }
-    });
+    // Local flag so heartbeat/focus handlers know if the channel is live.
+    let subscribed = false;
+
+    // ALL .on() callbacks MUST be registered before .subscribe() is called.
+    const channel = supabase
+      .channel('global-online-users')
+      .on('presence', { event: 'sync' }, () => {})
+      .on('presence', { event: 'join' }, () => {})
+      .on('presence', { event: 'leave' }, () => {})
+      .subscribe((status: string) => {
+        if (status === 'SUBSCRIBED') {
+          subscribed = true;
+          // Track with whatever user data is available at subscription time.
+          if (presenceDataRef.current) {
+            channel
+              .track({ ...presenceDataRef.current, online_at: new Date().toISOString() })
+              .catch(() => {});
+          }
+        } else if (
+          status === 'CHANNEL_ERROR' ||
+          status === 'TIMED_OUT' ||
+          status === 'CLOSED'
+        ) {
+          subscribed = false;
+        }
+      });
+
+    presenceChannelRef.current = channel;
 
     // Heartbeat: refresh online_at every 30 seconds
     const heartbeat = setInterval(() => {
-      if (presenceChannelRef.current && presenceDataRef.current) {
-        presenceChannelRef.current
+      if (subscribed && presenceDataRef.current) {
+        channel
           .track({ ...presenceDataRef.current, online_at: new Date().toISOString() })
           .catch(() => {});
       }
     }, 30_000);
 
-    // Re-sync when the tab regains focus (catches background tab reconnects)
+    // Re-sync on tab focus (catches background-tab reconnects)
     const onFocus = () => {
-      if (presenceChannelRef.current && presenceDataRef.current) {
-        presenceChannelRef.current
+      if (subscribed && presenceDataRef.current) {
+        channel
           .track({ ...presenceDataRef.current, online_at: new Date().toISOString() })
           .catch(() => {});
       }
@@ -250,23 +276,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener('focus', onFocus);
 
     return () => {
+      subscribed = false;
       clearInterval(heartbeat);
       window.removeEventListener('focus', onFocus);
-      if (presenceChannelRef.current) {
-        presenceChannelRef.current.untrack().catch(() => {});
-        supabase.removeChannel(presenceChannelRef.current);
-        presenceChannelRef.current = null;
-      }
+      channel.untrack().catch(() => {});
+      supabase.removeChannel(channel);
+      presenceChannelRef.current = null;
       presenceDataRef.current = null;
     };
   }, [supabaseUserId]);
 
-  // ── Update tracked data whenever user profile changes ───────────────────────
-  // Skips users with incomplete profiles so they don't appear in the hub.
+  // ── Re-track whenever the user's profile fields change ──────────────────────
+  // Skips incomplete profiles (no username) so they don't appear in the hub.
   useEffect(() => {
     if (!user || !supabaseUserId || !user.username) return;
     const payload = buildPresencePayload(user, supabaseUserId);
     presenceDataRef.current = payload;
+    // .track() is safe to call on an already-subscribed channel at any time.
     if (presenceChannelRef.current) {
       presenceChannelRef.current.track(payload).catch(() => {});
     }
