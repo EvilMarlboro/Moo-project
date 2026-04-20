@@ -23,7 +23,7 @@ export function LoginPage() {
     const { error: authError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://moo-project-ten.vercel.app/activity-hub',
+        redirectTo: `${window.location.origin}/activity-hub`,
         queryParams: { hd: 'usc.edu' },
       },
     });
