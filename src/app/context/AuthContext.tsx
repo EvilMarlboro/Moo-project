@@ -2,6 +2,20 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { supabase } from '../lib/supabase';
 import { getCategoryForActivity } from '../data/activityHelpers';
 
+export interface OnlineUser {
+  user_id: string;
+  username: string;
+  avatar: string;
+  genderSymbol?: string;
+  activities: string[];
+  activityProfiles?: Record<string, any>;
+  statusMessage?: string;
+  vibingMode?: boolean;
+  profileBackground?: string;
+  categories: string[];
+  online_at: string;
+}
+
 export interface User {
   id?: string;
   username: string;
@@ -22,6 +36,7 @@ interface AuthContextType {
   user: User | null | undefined;
   supabaseUserId: string | null;
   loading: boolean;
+  onlineUsers: OnlineUser[];
   login: (user: User) => void;
   logout: () => Promise<void>;
   updateUser: (updates: Partial<User>) => void;
@@ -55,6 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const isRefreshingRef = useRef(false);
   const signOutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const establishedUserIdRef = useRef<string | null>(null);
@@ -233,9 +249,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // ALL .on() callbacks MUST be registered before .subscribe() is called.
     const channel = supabase
       .channel('global-online-users')
-      .on('presence', { event: 'sync' }, () => {})
-      .on('presence', { event: 'join' }, () => {})
-      .on('presence', { event: 'leave' }, () => {})
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const users = Object.values(state).flat() as unknown as OnlineUser[];
+        setOnlineUsers(users);
+      })
+      .on('presence', { event: 'join' }, () => {
+        const state = channel.presenceState();
+        const users = Object.values(state).flat() as unknown as OnlineUser[];
+        setOnlineUsers(users);
+      })
+      .on('presence', { event: 'leave' }, () => {
+        const state = channel.presenceState();
+        const users = Object.values(state).flat() as unknown as OnlineUser[];
+        setOnlineUsers(users);
+      })
       .subscribe((status: string) => {
         if (status === 'SUBSCRIBED') {
           subscribed = true;
@@ -283,6 +311,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       supabase.removeChannel(channel);
       presenceChannelRef.current = null;
       presenceDataRef.current = null;
+      setOnlineUsers([]);
     };
   }, [supabaseUserId]);
 
@@ -299,7 +328,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, supabaseUserId]);
 
   return (
-    <AuthContext.Provider value={{ user, supabaseUserId, loading, login, logout, updateUser, refreshSession }}>
+    <AuthContext.Provider value={{ user, supabaseUserId, loading, onlineUsers, login, logout, updateUser, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );

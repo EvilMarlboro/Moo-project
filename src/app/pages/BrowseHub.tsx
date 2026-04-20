@@ -10,25 +10,13 @@ import { Users, Shield, MessageCircle, UserPlus } from 'lucide-react';
 import { CATEGORY_COLORS } from '../data/mockData';
 import { useNavigate } from 'react-router';
 import { Category, getCategoryForActivity } from '../data/activityHelpers';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, type OnlineUser } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
-interface OnlineUser {
-  user_id: string;
-  email: string;
-  username: string;
-  avatar: string;
-  genderSymbol?: string;
-  activities: string[];
-  statusMessage?: string;
-  vibingMode?: boolean;
-  categories: string[];
-  online_at: string;
-}
 
 export function BrowseHub() {
-  const { user, supabaseUserId } = useAuth();
+  const { user, supabaseUserId, onlineUsers } = useAuth();
   const navigate = useNavigate();
 
   // Redirect logged-in users to activity hub
@@ -39,30 +27,16 @@ export function BrowseHub() {
   }, [user, supabaseUserId, navigate]);
 
   const [activeCategory, setActiveCategory] = useState<Category>('sports');
-  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [loadingPresence, setLoadingPresence] = useState(true);
   const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
   const [acceptedConnections, setAcceptedConnections] = useState<Set<string>>(new Set());
 
   const allCategories: Category[] = ['sports', 'gaming', 'studying', 'campusEvents'];
 
-  // Subscribe to Supabase Realtime Presence (view only for unauthenticated users)
+  // Mark loading done once we get presence data from AuthContext
   useEffect(() => {
-    const channel = supabase.channel('global-online-users');
-
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const users = Object.values(state).flat() as unknown as OnlineUser[];
-        setOnlineUsers(users);
-        setLoadingPresence(false);
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+    if (onlineUsers.length > 0) setLoadingPresence(false);
+  }, [onlineUsers]);
 
   // Load accepted connections and keep in sync
   useEffect(() => {

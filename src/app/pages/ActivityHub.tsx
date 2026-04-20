@@ -9,7 +9,7 @@ import { Users, Volume2, Heart, MessageCircle, X, Check } from 'lucide-react';
 import { Shield, MoreVertical } from 'lucide-react';
 import { CATEGORY_COLORS } from '../data/mockData';
 import { PROFILE_BACKGROUNDS, type BackgroundKey } from '../data/profileBackgrounds';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, type OnlineUser } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
 import { getCategoryForActivity, getRequiredFieldsForActivity } from '../data/activityHelpers';
 import { useMatches } from '../context/MatchContext';
@@ -19,19 +19,6 @@ import { UserAvatar } from '../components/UserAvatar';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
-interface OnlineUser {
-  user_id: string;
-  email: string;
-  username: string;
-  avatar: string;
-  genderSymbol?: string;
-  activities: string[];
-  statusMessage?: string;
-  vibingMode?: boolean;
-  profileBackground?: string;
-  categories: string[];
-  online_at: string;
-}
 
 interface ChatItem {
   id: string;
@@ -94,7 +81,7 @@ function StarRating({
 }
 
 export function ActivityHub() {
-  const { user, supabaseUserId, updateUser } = useAuth();
+  const { user, supabaseUserId, updateUser, onlineUsers } = useAuth();
   const navigate = useNavigate();
   const { matches, addMatch } = useMatches();
 
@@ -109,7 +96,6 @@ export function ActivityHub() {
   const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
   const [expandedRequests, setExpandedRequests] = useState<Set<string>>(new Set());
   const [matchRequests, setMatchRequests] = useState<any[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
   const [acceptedConnections, setAcceptedConnections] = useState<Set<string>>(new Set());
   const [chats, setChats] = useState<ChatItem[]>([]);
@@ -431,19 +417,6 @@ export function ActivityHub() {
     return () => { supabase.removeChannel(channel); };
   }, [supabaseUserId]);
 
-  // Read-only subscriber to the global presence channel.
-  // AuthContext owns tracking — ActivityHub just reads the state.
-  useEffect(() => {
-    const channel = supabase.channel('global-online-users');
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const users = Object.values(state).flat() as unknown as OnlineUser[];
-        setOnlineUsers(users);
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, []);
 
   // Exclude self and any users with incomplete profiles
   const allOtherUsers = onlineUsers.filter(
