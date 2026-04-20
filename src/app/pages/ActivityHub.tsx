@@ -500,6 +500,7 @@ export function ActivityHub() {
       .select('id, status')
       .eq('sender_id', authUser.id)
       .eq('receiver_id', presenceUser.user_id)
+      .in('status', ['pending', 'accepted'])
       .maybeSingle();
 
     if (existing) {
