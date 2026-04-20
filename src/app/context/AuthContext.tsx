@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
+import { getCategoryForActivity } from '../data/activityHelpers';
 
 export interface User {
   id?: string;
@@ -30,6 +31,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Pure helper — defined outside the component so it's stable
+function buildPresencePayload(u: User, uid: string) {
+  const categories = Array.from(new Set(
+    (u.enabledActivities || []).map(a => getCategoryForActivity(a)).filter(Boolean)
+  ));
+  return {
+    user_id: uid,
+    username: u.username,
+    avatar: u.avatar || '👤',
+    genderSymbol: u.genderSymbol || '',
+    activities: u.enabledActivities || [],
+    activityProfiles: u.activityProfiles || {},
+    categories,
+    vibingMode: u.vibingMode || false,
+    statusMessage: u.statusMessage || '',
+    profileBackground: u.profileBackground || 'default',
+    online_at: new Date().toISOString(),
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
@@ -37,6 +58,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isRefreshingRef = useRef(false);
   const signOutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const establishedUserIdRef = useRef<string | null>(null);
+  const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const presenceDataRef = useRef<Record<string, any> | null>(null);
 
   const refreshSession = async () => {
     try {
@@ -182,6 +205,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
   };
+
+  // ── Global presence: channel lifecycle tied to supabaseUserId ──────────────
+  // Created on login, destroyed on logout. Never torn down on page navigation.
+  useEffect(() => {
+    if (!supabaseUserId) {
+      // Logged out — leave presence and clean up
+      if (presenceChannelRef.current) {
+        presenceChannelRef.current.untrack().catch(() => {});
+        supabase.removeChannel(presenceChannelRef.current);
+        presenceChannelRef.current = null;
+      }
+      presenceDataRef.current = null;
+      return;
+    }
+
+    const channel = supabase.channel('global-online-users');
+    presenceChannelRef.current = channel;
+
+    channel.subscribe((status: string) => {
+      // On subscribe (or reconnect after CHANNEL_ERROR), push current data
+      if (status === 'SUBSCRIBED' && presenceDataRef.current) {
+        channel.track({ ...presenceDataRef.current, online_at: new Date().toISOString() }).catch(() => {});
+      }
+    });
+
+    // Heartbeat: refresh online_at every 30 seconds
+    const heartbeat = setInterval(() => {
+      if (presenceChannelRef.current && presenceDataRef.current) {
+        presenceChannelRef.current
+          .track({ ...presenceDataRef.current, online_at: new Date().toISOString() })
+          .catch(() => {});
+      }
+    }, 30_000);
+
+    // Re-sync when the tab regains focus (catches background tab reconnects)
+    const onFocus = () => {
+      if (presenceChannelRef.current && presenceDataRef.current) {
+        presenceChannelRef.current
+          .track({ ...presenceDataRef.current, online_at: new Date().toISOString() })
+          .catch(() => {});
+      }
+    };
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      clearInterval(heartbeat);
+      window.removeEventListener('focus', onFocus);
+      if (presenceChannelRef.current) {
+        presenceChannelRef.current.untrack().catch(() => {});
+        supabase.removeChannel(presenceChannelRef.current);
+        presenceChannelRef.current = null;
+      }
+      presenceDataRef.current = null;
+    };
+  }, [supabaseUserId]);
+
+  // ── Update tracked data whenever user profile changes ───────────────────────
+  // Skips users with incomplete profiles so they don't appear in the hub.
+  useEffect(() => {
+    if (!user || !supabaseUserId || !user.username) return;
+    const payload = buildPresencePayload(user, supabaseUserId);
+    presenceDataRef.current = payload;
+    if (presenceChannelRef.current) {
+      presenceChannelRef.current.track(payload).catch(() => {});
+    }
+  }, [user, supabaseUserId]);
 
   return (
     <AuthContext.Provider value={{ user, supabaseUserId, loading, login, logout, updateUser, refreshSession }}>

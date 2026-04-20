@@ -431,10 +431,10 @@ export function ActivityHub() {
     return () => { supabase.removeChannel(channel); };
   }, [supabaseUserId]);
 
-  // Subscribe to Supabase Realtime Presence
+  // Read-only subscriber to the global presence channel.
+  // AuthContext owns tracking — ActivityHub just reads the state.
   useEffect(() => {
-    if (!user || !supabaseUserId) return;
-    const channel = supabase.channel('online-users');
+    const channel = supabase.channel('global-online-users');
     channel
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState();
@@ -443,39 +443,12 @@ export function ActivityHub() {
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [user?.id, supabaseUserId]);
+  }, []);
 
-  // Track presence when user data changes
-  useEffect(() => {
-    if (!user || !supabaseUserId) return;
-    const channel = supabase.channel('online-users');
-    const trackPresence = async () => {
-      const categories = Array.from(
-        new Set(
-          (user.enabledActivities || [])
-            .map((a) => getCategoryForActivity(a))
-            .filter(Boolean)
-        )
-      );
-      await channel.track({
-        user_id: supabaseUserId,
-        email: user.email,
-        username: user.username,
-        avatar: user.avatar || '👤',
-        genderSymbol: user.genderSymbol || '',
-        activities: user.enabledActivities || [],
-        statusMessage: user.statusMessage || '',
-        vibingMode: user.vibingMode || false,
-        profileBackground: user.profileBackground || 'default',
-        categories,
-        online_at: new Date().toISOString(),
-      });
-    };
-    trackPresence();
-    return () => { channel.untrack(); };
-  }, [user, supabaseUserId]);
-
-  const allOtherUsers = onlineUsers.filter(u => u.user_id !== supabaseUserId);
+  // Exclude self and any users with incomplete profiles
+  const allOtherUsers = onlineUsers.filter(
+    u => u.user_id !== supabaseUserId && !!u.username && !!u.avatar
+  );
 
   const openUserModal = async (presenceUser: OnlineUser) => {
     setSelectedUser(presenceUser);

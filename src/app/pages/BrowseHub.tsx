@@ -48,7 +48,7 @@ export function BrowseHub() {
 
   // Subscribe to Supabase Realtime Presence (view only for unauthenticated users)
   useEffect(() => {
-    const channel = supabase.channel('online-users');
+    const channel = supabase.channel('global-online-users');
 
     channel
       .on('presence', { event: 'sync' }, () => {
@@ -103,7 +103,9 @@ export function BrowseHub() {
   }, [supabaseUserId]);
 
   // Filter out self and filter by category
-  const otherUsers = onlineUsers.filter((u) => u.user_id !== supabaseUserId);
+  const otherUsers = onlineUsers.filter(
+    (u) => u.user_id !== supabaseUserId && !!u.username && !!u.avatar
+  );
   const filteredUsers = otherUsers.filter((u) => {
     if (u.vibingMode) return true; // vibing users show in all categories
     return (u.categories || []).includes(activeCategory);
