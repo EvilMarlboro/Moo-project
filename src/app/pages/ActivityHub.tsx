@@ -135,7 +135,7 @@ export function ActivityHub() {
     const { data, error } = await supabase
       .from('match_requests')
       .select('*')
-      .eq('receiver_id', authUser.id)
+      .or(`receiver_id.eq.${authUser.id},sender_id.eq.${authUser.id}`)
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
@@ -148,17 +148,20 @@ export function ActivityHub() {
 
     const enriched = await Promise.all(
       data.map(async (req: any) => {
+        const isIncoming = req.receiver_id === authUser.id;
+        const profileId = isIncoming ? req.sender_id : req.receiver_id;
         try {
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('display_name, avatar, gender')
-            .eq('id', req.sender_id)
+            .eq('id', profileId)
             .single();
 
           const category = getCategoryForActivity(req.activity || '') || 'sports';
           if (profile && !profileError) {
             return {
               ...req,
+              direction: isIncoming ? 'incoming' : 'outgoing',
               username: profile.display_name || 'User',
               avatar: profile.avatar || '👤',
               genderSymbol: profile.gender || '',
@@ -169,6 +172,7 @@ export function ActivityHub() {
           }
           return {
             ...req,
+            direction: isIncoming ? 'incoming' : 'outgoing',
             username: 'User',
             avatar: '👤',
             genderSymbol: '',
@@ -179,6 +183,7 @@ export function ActivityHub() {
         } catch {
           return {
             ...req,
+            direction: isIncoming ? 'incoming' : 'outgoing',
             username: 'User',
             avatar: '👤',
             genderSymbol: '',
@@ -202,6 +207,8 @@ export function ActivityHub() {
     const channel = supabase
       .channel('match-requests-' + supabaseUserId)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_requests', filter: `receiver_id=eq.${supabaseUserId}` },
+        () => fetchMatchRequests())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_requests', filter: `sender_id=eq.${supabaseUserId}` },
         () => fetchMatchRequests())
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'match_requests', filter: `receiver_id=eq.${supabaseUserId}` },
         () => fetchMatchRequests())
@@ -512,6 +519,7 @@ export function ActivityHub() {
     } else {
       setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
       toast.success('Request sent! ✓');
+      fetchMatchRequests();
     }
   };
 
@@ -873,14 +881,21 @@ export function ActivityHub() {
                             )}
                           </>
                         )}
-                        <div className="flex gap-2">
-                          <Button size="sm" className="flex-1 bg-green-500 hover:bg-green-600 h-8" onClick={() => handleAcceptMatch(request.id)}>
-                            <Check className="h-3 w-3 mr-1" />Accept
-                          </Button>
-                          <Button size="sm" variant="outline" className="flex-1 h-8" onClick={() => handleDeclineMatch(request.id)}>
-                            <X className="h-3 w-3 mr-1" />Decline
-                          </Button>
-                        </div>
+                        {request.direction === 'outgoing' ? (
+                          <div className="flex items-center justify-center gap-1.5 py-1.5 rounded-md bg-secondary/60 text-xs text-muted-foreground">
+                            <Check className="h-3 w-3 text-green-500" />
+                            Request Sent — Awaiting response
+                          </div>
+                        ) : (
+                          <div className="flex gap-2">
+                            <Button size="sm" className="flex-1 bg-green-500 hover:bg-green-600 h-8" onClick={() => handleAcceptMatch(request.id)}>
+                              <Check className="h-3 w-3 mr-1" />Accept
+                            </Button>
+                            <Button size="sm" variant="outline" className="flex-1 h-8" onClick={() => handleDeclineMatch(request.id)}>
+                              <X className="h-3 w-3 mr-1" />Decline
+                            </Button>
+                          </div>
+                        )}
                       </Card>
                     );
                   })
