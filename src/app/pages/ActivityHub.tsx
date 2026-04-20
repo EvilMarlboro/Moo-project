@@ -139,8 +139,6 @@ export function ActivityHub() {
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
-    console.log('[fetchMatchRequests] error:', error, '| raw data:', data);
-
     if (error) return;
 
     if (!data || data.length === 0) {
@@ -209,7 +207,7 @@ export function ActivityHub() {
     const channel = supabase
       .channel('match-requests-' + supabaseUserId)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_requests', filter: `receiver_id=eq.${supabaseUserId}` },
-        (payload) => { console.log('[realtime] INSERT receiver_id match:', payload); fetchMatchRequests(); })
+        () => fetchMatchRequests())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_requests', filter: `sender_id=eq.${supabaseUserId}` },
         () => fetchMatchRequests())
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'match_requests', filter: `receiver_id=eq.${supabaseUserId}` },
@@ -493,8 +491,6 @@ export function ActivityHub() {
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) return;
 
-    console.log('[handleConnect] supabaseUserId:', supabaseUserId, '| authUser.id:', authUser.id);
-
     const { data: existing } = await supabase
       .from('match_requests')
       .select('id, status')
@@ -517,18 +513,9 @@ export function ActivityHub() {
       status: 'pending',
       sender_email: authUser.email,
     };
-    console.log('[handleConnect] attempting insert with:', {
-      sender_id: insertPayload.sender_id,
-      receiver_id: insertPayload.receiver_id,
-      activity: insertPayload.activity,
-      status: 'pending',
-    });
-
-    const { data: insertData, error } = await supabase
+    const { error } = await supabase
       .from('match_requests')
-      .insert(insertPayload)
-      .select();
-    console.log('[handleConnect] insert result - error:', error, 'data:', insertData);
+      .insert(insertPayload);
 
     if (error) {
       toast.error('Error: ' + error.message);
