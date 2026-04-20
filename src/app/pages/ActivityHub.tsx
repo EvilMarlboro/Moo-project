@@ -516,13 +516,20 @@ export function ActivityHub() {
       status: 'pending',
       sender_email: authUser.email,
     };
-    console.log('[handleConnect] inserting:', insertPayload);
+    console.log('[handleConnect] attempting insert with:', {
+      sender_id: insertPayload.sender_id,
+      receiver_id: insertPayload.receiver_id,
+      activity: insertPayload.activity,
+      status: 'pending',
+    });
 
-    const { error } = await supabase
+    const { data: insertData, error } = await supabase
       .from('match_requests')
-      .insert(insertPayload);
+      .insert(insertPayload)
+      .select();
+    console.log('[handleConnect] insert result - error:', error, 'data:', insertData);
+
     if (error) {
-      console.error('[handleConnect] insert error:', error);
       toast.error('Error: ' + error.message);
     } else {
       setSentRequests(prev => new Set(prev).add(presenceUser.user_id));
