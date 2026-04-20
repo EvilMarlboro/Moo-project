@@ -139,6 +139,8 @@ export function ActivityHub() {
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
+    console.log('[fetchMatchRequests] error:', error, '| raw data:', data);
+
     if (error) return;
 
     if (!data || data.length === 0) {
@@ -207,7 +209,7 @@ export function ActivityHub() {
     const channel = supabase
       .channel('match-requests-' + supabaseUserId)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_requests', filter: `receiver_id=eq.${supabaseUserId}` },
-        () => fetchMatchRequests())
+        (payload) => { console.log('[realtime] INSERT receiver_id match:', payload); fetchMatchRequests(); })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_requests', filter: `sender_id=eq.${supabaseUserId}` },
         () => fetchMatchRequests())
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'match_requests', filter: `receiver_id=eq.${supabaseUserId}` },
