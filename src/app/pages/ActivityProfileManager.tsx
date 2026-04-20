@@ -17,12 +17,14 @@ import {
 } from '../data/activityHelpers';
 import { hasRankSystem, getRanksForGame, getRankLabelForGame, getIdSystemForGame } from '../data/gameRanks';
 import { supabase } from '../lib/supabase';
+import { toast } from 'sonner';
 
 export function ActivityProfileManager() {
   const { user, supabaseUserId, updateUser } = useAuth();
   const navigate = useNavigate();
   const [editingActivity, setEditingActivity] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
+  const [saving, setSaving] = useState(false);
 
   if (!user) {
     return null;
@@ -39,24 +41,27 @@ export function ActivityProfileManager() {
   );
 
   const handleSaveProfile = async (activity: string) => {
-    const activityProfiles = {
-      ...user.activityProfiles,
-      [activity]: formData
-    };
-
-    // Update local state
-    updateUser({ activityProfiles });
-    
-    // Save to Supabase
-    if (supabaseUserId) {
-      await supabase.from('profiles').upsert({
-        id: supabaseUserId,
-        activity_profiles: activityProfiles,
-      });
+    setSaving(true);
+    try {
+      const activityProfiles = {
+        ...user.activityProfiles,
+        [activity]: formData,
+      };
+      updateUser({ activityProfiles });
+      if (supabaseUserId) {
+        const { error } = await supabase.from('profiles').upsert({
+          id: supabaseUserId,
+          activity_profiles: activityProfiles,
+        });
+        if (error) throw error;
+      }
+      setEditingActivity(null);
+      setFormData({});
+    } catch {
+      toast.error('Failed to save profile. Please try again.');
+    } finally {
+      setSaving(false);
     }
-    
-    setEditingActivity(null);
-    setFormData({});
   };
 
   const handleStartEditing = (activity: string) => {
@@ -142,15 +147,11 @@ export function ActivityProfileManager() {
 
           <Button
             onClick={() => handleSaveProfile(activity)}
-            disabled={
-              (hasRanks && !formData.skillRank) || 
-              !formData.playStyle || 
-              !formData.micPreference
-            }
+            disabled={saving || (hasRanks && !formData.skillRank) || !formData.playStyle || !formData.micPreference}
             className="w-full"
             style={{ backgroundColor: color }}
           >
-            Save Profile for {activity}
+            {saving ? 'Saving...' : `Save Profile for ${activity}`}
           </Button>
         </div>
       );
@@ -195,11 +196,11 @@ export function ActivityProfileManager() {
 
           <Button
             onClick={() => handleSaveProfile(activity)}
-            disabled={!formData.skillLevel || !formData.vibe}
+            disabled={saving || !formData.skillLevel || !formData.vibe}
             className="w-full"
             style={{ backgroundColor: color }}
           >
-            Save Profile for {activity}
+            {saving ? 'Saving...' : `Save Profile for ${activity}`}
           </Button>
         </div>
       );
@@ -237,11 +238,11 @@ export function ActivityProfileManager() {
 
           <Button
             onClick={() => handleSaveProfile(activity)}
-            disabled={!formData.major || !formData.environment}
+            disabled={saving || !formData.major || !formData.environment}
             className="w-full"
             style={{ backgroundColor: color }}
           >
-            Save Profile for {activity}
+            {saving ? 'Saving...' : `Save Profile for ${activity}`}
           </Button>
         </div>
       );
@@ -255,10 +256,11 @@ export function ActivityProfileManager() {
         </p>
         <Button
           onClick={() => handleSaveProfile(activity)}
+          disabled={saving}
           className="w-full"
           style={{ backgroundColor: color }}
         >
-          Enable {activity}
+          {saving ? 'Saving...' : `Enable ${activity}`}
         </Button>
       </div>
     );

@@ -7,6 +7,7 @@ import { CheckCircle } from 'lucide-react';
 import { ACTIVITIES, CATEGORY_COLORS } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
+import { toast } from 'sonner';
 
 type Category = keyof typeof ACTIVITIES;
 
@@ -21,6 +22,7 @@ export function ActivitySelection() {
   const navigate = useNavigate();
   const { user, supabaseUserId, updateUser } = useAuth();
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (user?.enabledActivities && user.enabledActivities.length > 0) {
@@ -39,11 +41,19 @@ export function ActivitySelection() {
   };
 
   const handleContinue = async () => {
-    updateUser({ enabledActivities: selectedActivities });
-    if (supabaseUserId) {
-      await supabase.from('profiles').upsert({ id: supabaseUserId, enabled_activities: selectedActivities });
+    setSaving(true);
+    try {
+      updateUser({ enabledActivities: selectedActivities });
+      if (supabaseUserId) {
+        const { error } = await supabase.from('profiles').upsert({ id: supabaseUserId, enabled_activities: selectedActivities });
+        if (error) throw error;
+      }
+      navigate('/activity-profile');
+    } catch {
+      toast.error('Failed to save activities. Please try again.');
+    } finally {
+      setSaving(false);
     }
-    navigate('/activity-profile');
   };
 
   const allCategories: { key: Category; name: string }[] = [
@@ -178,8 +188,8 @@ export function ActivitySelection() {
 
         <div className="flex justify-center gap-4">
           <Button variant="ghost" onClick={() => navigate(-1)} size="lg">Back</Button>
-          <Button onClick={handleContinue} disabled={selectedActivities.length === 0} size="lg" className="px-12">
-            Continue to Profile Setup →
+          <Button onClick={handleContinue} disabled={selectedActivities.length === 0 || saving} size="lg" className="px-12">
+            {saving ? 'Saving...' : 'Continue to Profile Setup →'}
           </Button>
         </div>
       </div>

@@ -17,7 +17,7 @@ export function LandingPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [hasScrolledPast, setHasScrolledPast] = useState(false);
+  const hasScrolledPastRef = useRef(false);
 
   // Compute hero scale from live viewport width so layout never overflows
   const [heroScale, setHeroScale] = useState(() =>
@@ -56,10 +56,11 @@ export function LandingPage() {
   const filter = useMotionTemplate`blur(${blurValue}px)`;
 
   useEffect(() => {
+    hasScrolledPastRef.current = false;
     const unsubscribe = scrollY.on('change', (latest) => {
       const scrollPercent = (latest / 500) * 100;
-      if (scrollPercent > 50 && !hasScrolledPast) {
-        setHasScrolledPast(true);
+      if (scrollPercent > 50 && !hasScrolledPastRef.current) {
+        hasScrolledPastRef.current = true;
         setTimeout(() => {
           if (user && user.username === '') {
             navigate('/profile-setup');
@@ -72,7 +73,7 @@ export function LandingPage() {
       }
     });
     return () => unsubscribe();
-  }, [scrollY, navigate, hasScrolledPast, user]);
+  }, [scrollY, navigate, user]);
 
   return (
     <div

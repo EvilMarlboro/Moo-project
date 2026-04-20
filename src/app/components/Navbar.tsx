@@ -6,11 +6,21 @@ import { useAuth } from '../context/AuthContext';
 import { UserAvatar } from './UserAvatar';
 import { supabase } from '../lib/supabase';
 
+interface Notification {
+  id: string;
+  user_id: string;
+  type: string;
+  message: string;
+  data?: Record<string, any>;
+  read: boolean;
+  created_at: string;
+}
+
 export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, supabaseUserId } = useAuth();
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notiOpen, setNotiOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const notiRef = useRef<HTMLDivElement>(null);
@@ -39,7 +49,7 @@ export function Navbar() {
         table: 'notifications',
         filter: `user_id=eq.${supabaseUserId}`,
       }, (payload) => {
-        setNotifications(prev => [payload.new as any, ...prev]);
+        setNotifications(prev => [payload.new as Notification, ...prev]);
       })
       .subscribe();
 
